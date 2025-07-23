@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import QustionIcon from "../../assets/icons/question-circle.svg";
+import Money from "../../assets/icons/Group.svg";
 
 const DataItem = styled.div`
     display: flex;
@@ -39,8 +41,8 @@ const DataItemContent = styled.div`
 export const HeaderDataItem = ({title, question, value, index}) =>{
     return (
         <DataItem key={index}>
-            <DataItemTitle>{title} {title ? <p>s</p> : ''}</DataItemTitle>
-            <DataItemContent>{question ? <p>ss</p> : ''} {value}</DataItemContent>
+            <DataItemTitle>{title} {question ? <img src={QustionIcon} alt="QustionIcon"/> : ''}</DataItemTitle>
+            <DataItemContent>{question ? <img src={Money} alt="Money"/> : ''} {value}</DataItemContent>
         </DataItem>
     )
 }

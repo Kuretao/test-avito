@@ -15,6 +15,18 @@ const Data = [
         question: false,
         value: "40%",
     },
+    {
+        id: 3,
+        title: 'Баланс на счете',
+        question: false,
+        value: "40%",
+    },
+    {
+        id: 4,
+        title: 'Баланс на счете',
+        question: false,
+        value: "40%",
+    },
 ]
 
 const Header = styled.header`

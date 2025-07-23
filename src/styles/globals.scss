@@ -16,13 +16,16 @@
   vertical-align: baseline;
 }
 
+body{
+  padding: 20px;
+}
+
 html, body {
   height: 100%;
   font-family: "Raleway", sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  padding: 20px;
   background: #EBF3F7;
 }
 

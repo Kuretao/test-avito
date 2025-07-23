@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import SearchIcon from '../assets/icons/search.svg'
 
 const InputWrapper = styled.div`
     position: relative;
@@ -43,7 +44,7 @@ export default function Input({ value, onChange, onSearch, placeholder }) {
                 }}
             />
             <SearchButton onClick={onSearch} aria-label="Search">
-                search
+                <img src={SearchIcon} alt="search-icon"/>
             </SearchButton>
         </InputWrapper>
     );

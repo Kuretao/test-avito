@@ -1,9 +1,11 @@
 import styled from "styled-components";
+import link from "../../assets/icons/link 2.svg"
 
 const RequisiteRow = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 8px;
+    column-gap: 16px;
+    min-height: 18px;
 `
 
 const RequisiteRowTitle = styled.h3`
@@ -22,11 +24,21 @@ const RequisiteRowContent = styled.span`
     color: #64748B;
 `
 
+function ReqValue({ value }) {
+    if (value === true) {
+        return <a href={value}><img style={{width:18, height:18}} src={link} alt=""/></a>;
+    }
+    if (value || value === 0) {
+        return value;
+    }
+    return "-";
+}
+
 export const RequisitesRow = ({title,value,index}) => {
     return (
         <RequisiteRow key={index}>
             <RequisiteRowTitle>{title}</RequisiteRowTitle>
-            <RequisiteRowContent>{value}</RequisiteRowContent>
+            <RequisiteRowContent>{ReqValue({ value })}</RequisiteRowContent>
         </RequisiteRow>
     )
 }

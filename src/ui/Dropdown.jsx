@@ -1,46 +1,52 @@
 import React, {useEffect, useRef, useState} from "react";
 import styled from "styled-components";
+import arrow from "../assets/icons/angle-down.svg"
 
 const DropdownWrapper = styled.div`
     position: relative;
-    width: 120px;
+    width: max-content;
     user-select: none;
 `;
 
 const DropdownHeader = styled.div`
-    padding: 6px 15px;
-    border: 1px solid #cbd5e1;
+    padding: 4px 16px;
+    border: 1px solid #CBD5E1;
     border-radius: 8px;
-    background: #f7fafc;
+    background: #FFFFFF80;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    gap: 16px;
     align-items: center;
+    color: #64748B;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0%;
 `;
 
 const DropdownList = styled.ul`
     position: absolute;
-    top: calc(100% + 6px);
+    top: 100%;
     left: 0;
     right: 0;
-    background: white;
+    background: #FFFFFF80;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     list-style: none;
     margin: 0;
     padding: 0;
-    max-height: 150px;
+    height: max-content;
     overflow-y: auto;
     z-index: 999;
+    box-shadow: 0 2px 12px 0 #00466633;
 `;
 
 const DropdownItem = styled.li`
-    padding: 8px 15px;
+    height: 40px;
+    padding: 12px;
     cursor: pointer;
-
-    &:hover {
-        background-color: #e2e8f0;
-    }
+    background-color: #FFFFFF80;
 `;
 
 export function Dropdown({ options, value, onChange }) {
@@ -65,7 +71,7 @@ export function Dropdown({ options, value, onChange }) {
         <DropdownWrapper ref={ref}>
             <DropdownHeader onClick={() => setOpen(!open)} aria-haspopup="listbox" aria-expanded={open}>
                 <span>{selectedLabel || "Выберите"}</span>
-                <span style={{ marginLeft: 10 }}>{open ? "▲" : "▼"}</span>
+                <span style={{ marginLeft: 10 }}>{open ? <img style={{transform:"rotate(180deg)"}} src={arrow} alt="arrow"/> : <img src={arrow} alt="arrow"/>}</span>
             </DropdownHeader>
             {open && (
                 <DropdownList role="listbox">
