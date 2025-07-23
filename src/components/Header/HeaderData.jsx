@@ -6,6 +6,10 @@ const DataItem = styled.div`
     gap: 8px;
     border-left: 1px solid #94A3BB;
     padding: 0 15px;
+    
+    &:first-child {
+        border-left: none;
+    }
 `
 
 const DataItemTitle = styled.div`
@@ -32,9 +36,9 @@ const DataItemContent = styled.div`
 
 
 
-export const HeaderDataItem = ({title, question, value, id}) =>{
+export const HeaderDataItem = ({title, question, value, index}) =>{
     return (
-        <DataItem key={id}>
+        <DataItem key={index}>
             <DataItemTitle>{title} {title ? <p>s</p> : ''}</DataItemTitle>
             <DataItemContent>{question ? <p>ss</p> : ''} {value}</DataItemContent>
         </DataItem>

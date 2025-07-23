@@ -22,7 +22,7 @@ const Header = styled.header`
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: #fff;
+    background: #FFFFFF80;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px 0 #00466626;
@@ -39,7 +39,7 @@ function IndexHeader() {
         <Header>
             <HeaderContent>
                 {Data.map((item) => (
-                    <HeaderDataItem key={item.id} title={item.title} question={item.question} value={item.value} />
+                    <HeaderDataItem index={item.id} title={item.title} question={item.question} value={item.value} />
                 ))}
             </HeaderContent>
 

@@ -23,6 +23,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   padding: 20px;
+  background: #EBF3F7;
 }
 
 img, picture, video, canvas, svg {
@@ -60,7 +61,6 @@ h1{
   font-size: clamp(32px, 5vw, 48px);
   line-height: 100%;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 h2{
@@ -68,7 +68,6 @@ h2{
   font-weight: 800;
   line-height: 100%;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 h3{
@@ -76,7 +75,6 @@ h3{
   line-height: 100%;
   font-weight: 800;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 h4{
