@@ -1,15 +1,31 @@
 import React from "react";
+import styled from "styled-components";
+
+const TableHead = styled.thead`
+    border-bottom: 1px solid #94A3BB;
+    height: max-content;
+    &>tr>th{
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 24px;
+        vertical-align: middle;
+        color: #475569;
+
+        padding-bottom: 16px;
+        text-align: left;
+    }
+`
 
 export default function TableHeader() {
     return (
-        <thead>
-            <tr style={{borderBottom: "1px solid #e2e8f0", background: "#f9fafb"}}>
-                <th style={{padding: "12px 10px", textAlign: "left", fontWeight: 600, fontSize: "14px"}}>Дата</th>
-                <th style={{padding: "12px 10px", textAlign: "left", fontWeight: 600, fontSize: "14px"}}>Сумма</th>
-                <th style={{padding: "12px 10px", textAlign: "left", fontWeight: 600, fontSize: "14px"}}>Запрос на выплату</th>
-                <th style={{padding: "12px 10px", textAlign: "left", fontWeight: 600, fontSize: "14px"}}>Куда перевести</th>
-                <th style={{padding: "12px 10px", textAlign: "left", fontWeight: 600, fontSize: "14px"}}>Статус</th>
+        <TableHead>
+            <tr >
+                <th >Дата</th>
+                <th >Сумма</th>
+                <th >Запрос на выплату</th>
+                <th >Куда перевести</th>
+                <th >Статус</th>
             </tr>
-        </thead>
+        </TableHead>
     );
 }

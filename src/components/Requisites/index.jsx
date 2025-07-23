@@ -28,6 +28,10 @@ const RequisitesContainer = styled.section`
     border-radius: 8px;
     box-shadow: 0 2px 8px 0 #00466626;
     background: #FFFFFF80;
+    
+    &>*{
+        font-family: "Manrope", sans-serif;
+    }
 `
 
 const RequisitesTitle = styled.h1`

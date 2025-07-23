@@ -3,23 +3,25 @@ import styled from "styled-components";
 
 const InputWrapper = styled.div`
     position: relative;
-    max-width: 400px;
+    width: 100%;
     margin-bottom: 16px;
 `;
 
 const InputStyled = styled.input`
     width: 100%;
-    padding: 10px 40px 10px 15px;
-    border: 1px solid #cbd5e1;
+    padding: 8px 16px;
+    border: 1px solid #94A3BB;
     border-radius: 8px;
     font-size: 14px;
-    background: #f7fafc;
+    font-weight: 500;
+    line-height: 24px;
     box-sizing: border-box;
+    color: #64748B;
 `;
 
 const SearchButton = styled.button`
     position: absolute;
-    right: 8px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
     border: none;

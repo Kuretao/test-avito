@@ -7,6 +7,7 @@ const RequisiteRow = styled.div`
 `
 
 const RequisiteRowTitle = styled.h3`
+    font-family: "Manrope", sans-serif;
     font-weight: 600;
     font-size: 13px;
     line-height: 100%;
@@ -14,6 +15,7 @@ const RequisiteRowTitle = styled.h3`
 `
 
 const RequisiteRowContent = styled.span`
+    font-family: "Manrope", sans-serif;
     font-weight: 700;
     font-size: 13px;
     line-height: 100%;

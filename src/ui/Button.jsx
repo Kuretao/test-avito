@@ -10,6 +10,7 @@ const Button = styled.button`
     text-align: center;
     padding: 8px 14px;
     border-radius: 8px;
+    font-family: "Manrope", sans-serif;
 `
 
 export const ButtonDefault = ({ButtonTitle}) => {

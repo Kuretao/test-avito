@@ -24,6 +24,24 @@ const data = [
         transferTo: "8202206254381556",
         status: "выплачено",
     },
+    {
+        date: "05.02.2024 11:31",
+        amount: "59 440 ₽",
+        payoutRequest: [
+            { type: "success", label: "перевод на банковскую карту" }
+        ],
+        transferTo: "8202206254381556",
+        status: "выплачено",
+    },
+    {
+        date: "05.02.2024 11:31",
+        amount: "59 440 ₽",
+        payoutRequest: [
+            { type: "success", label: "перевод на банковскую карту" }
+        ],
+        transferTo: "8202206254381556",
+        status: "выплачено",
+    },
 ];
 
 const TableContainer = styled.section`

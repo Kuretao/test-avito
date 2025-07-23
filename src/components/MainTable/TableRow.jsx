@@ -1,16 +1,30 @@
 import React from "react";
 import styled from "styled-components";
-import Dropdown from "../../ui/Dropdown.jsx";
+import OptionTable from "../../ui/Option.jsx";
+
 
 const Tr = styled.tr`
-  border-bottom: 1px solid #e2e8f0;
+  &:last-child{
+      border-bottom: 1px solid #94A3BB;
+      
+      &>td{
+          padding-bottom: 16px;
+      }
+  }
+    
+    &:first-child{
+        &>td{
+            padding-top: 16px;
+        } 
+    }
 `;
 
 const Td = styled.td`
-  padding: 12px 10px;
-  font-size: 14px;
-  color: #334155;
-  vertical-align: middle;
+    padding: 4px 0;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    color: #64748B;
 `;
 
 const PayoutContainer = styled.div`
@@ -27,13 +41,13 @@ export default function TableRow({ row }) {
             <Td>
                 <PayoutContainer>
                     {row.payoutRequest.map((item, idx) => (
-                        <Dropdown key={idx} type={item.type}>{item.label}</Dropdown>
+                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
                     ))}
                 </PayoutContainer>
             </Td>
             <Td>{row.transferTo}</Td>
             <Td>
-                <Dropdown type="success">{row.status}</Dropdown>
+                <OptionTable type="success">{row.status}</OptionTable>
             </Td>
         </Tr>
     );
