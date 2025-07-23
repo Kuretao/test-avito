@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import {HeaderDataItem} from "./HeaderData.jsx";
+import {ButtonDefault} from "../../ui/Button.jsx";
 
 const Data = [
     {
@@ -19,7 +20,12 @@ const Data = [
 const Header = styled.header`
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px 0 #00466626;
 `
 
 const HeaderContent = styled.div`
@@ -36,6 +42,8 @@ function IndexHeader() {
                     <HeaderDataItem key={item.id} title={item.title} question={item.question} value={item.value} />
                 ))}
             </HeaderContent>
+
+            <ButtonDefault ButtonTitle={"Запрос на выплату"}/>
         </Header>
     )
 }

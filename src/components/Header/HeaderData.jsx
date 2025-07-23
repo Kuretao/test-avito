@@ -5,6 +5,7 @@ const DataItem = styled.div`
     flex-direction: column;
     gap: 8px;
     border-left: 1px solid #94A3BB;
+    padding: 0 15px;
 `
 
 const DataItemTitle = styled.div`
