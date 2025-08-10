@@ -13,47 +13,63 @@ const Wrapper = styled.div`
 const data = [
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
-        payoutRequest: [
-            {type: "info", label: "выплачено ранее (обновление партнерской программы)"}
+        amount: "13212",
+        id: 42000,
+        items: '10 акк.',
+        price: [
+            {type: "success", label: "1300 ₽"}
         ],
-        transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+        status: [
+            {type: "success", label: "выплачено"}
         ],
-        status: "выплачено",
+        priceOut: [
+            {type: "success", label: "500"}
+        ],
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
-        payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+        amount: "13212",
+        id: 42000,
+        items: '10 акк.',
+        price: [
+            {type: "success", label: "1300 ₽"}
         ],
-        transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+        status: [
+            {type: "success", label: "выплачено"}
         ],
-        status: "выплачено",
+        priceOut: [
+            {type: "success", label: "500"}
+        ],
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
-        payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+        amount: "13212",
+        id: 42000,
+        items: '10 акк.',
+        price: [
+            {type: "success", label: "1300 ₽"}
         ],
-        transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+        status: [
+            {type: "success", label: "выплачено"}
         ],
-        status: "выплачено",
+        priceOut: [
+            {type: "success", label: "500"}
+        ],
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
-        payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+        amount: "13212",
+        id: 42000,
+        items: '10 акк.',
+        price: [
+            {type: "success", label: "1300 ₽"}
         ],
-        transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+        status: [
+            {type: "success", label: "выплачено"}
         ],
-        status: "выплачено",
+        priceOut: [
+            {type: "success", label: "500"}
+        ],
     },
 ];
 
@@ -171,7 +187,6 @@ export const PayReferrals = () => {
         }
     }, [filter]);
 
-
     const onFilterClick = value => {
         setFilter(value);
         setCustomDate("");
@@ -205,6 +220,7 @@ export const PayReferrals = () => {
         setSearchTerm(inputValue);
     };
 
+
     return (
         <Wrapper>
             <ChartsBlock chartData={chartData} onDateChange={onDateChange} customDate={customDate} filter={filter} onFilterClick={onFilterClick} />
@@ -226,28 +242,28 @@ export const PayReferrals = () => {
                         <Tr>
                             <Td>{item.date}</Td>
                             <Td>{item.amount}</Td>
+                            <Td>{item.id}</Td>
+                            <Td>{item.items}</Td>
                             <Td>
                                 <PayoutContainer>
-                                    {item.payoutRequest.map((item, idx) => (
+                                    {item.price.map((item, idx) => (
                                         <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
                                     ))}
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer>
-                                    {item.transferTo.map((item, idx) => (
+                                    {item.status.map((item, idx) => (
                                         <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
                                     ))}
                                 </PayoutContainer>
                             </Td>
                             <Td>
-                                {item.status}
-                            </Td>
-                            <Td>
-                                {item.status}
-                            </Td>
-                            <Td>
-                                {item.status}
+                                <PayoutContainer>
+                                    {item.priceOut.map((item, idx) => (
+                                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                    ))}
+                                </PayoutContainer>
                             </Td>
                         </Tr>
                     ))}

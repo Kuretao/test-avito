@@ -9,47 +9,47 @@ import OptionTable from "../ui/Option.jsx";
 const data = [
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
+        amount: "29999",
         payoutRequest: [
-            {type: "info", label: "выплачено ранее (обновление партнерской программы)"}
+            {type: "info", label: "1 300 ₽"}
         ],
         transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "success", label: "300 ₽"}
         ],
-        status: "выплачено",
+        status: "Вакансии Крд Петров - акк № 3",
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
+        amount: "29999",
         payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "info", label: "1 300 ₽"}
         ],
         transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "success", label: "300 ₽"}
         ],
-        status: "выплачено",
+        status: "Вакансии Крд Петров - акк № 3",
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
+        amount: "29999",
         payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "info", label: "1 300 ₽"}
         ],
         transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "success", label: "300 ₽"}
         ],
-        status: "выплачено",
+        status: "Вакансии Крд Петров - акк № 3",
     },
     {
         date: "05.02.2024 11:31",
-        amount: "59 440 ₽",
+        amount: "29999",
         payoutRequest: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "info", label: "1 300 ₽"}
         ],
         transferTo: [
-            {type: "success", label: "перевод на банковскую карту"}
+            {type: "success", label: "300 ₽"}
         ],
-        status: "выплачено",
+        status: "Вакансии Крд Петров - акк № 3",
     },
 ];
 
@@ -154,7 +154,7 @@ function Referrals() {
         <TableContainer>
             <RefHeader>
                 <span>Количество пользователей: 114</span>
-                <ButtonDefault ButtonTitle={"Добавить рефералов"}/>
+                <ButtonDefault ButtonTitle={"+ Добавить рефералов"}/>
             </RefHeader>
             <Input
                 value={inputValue}

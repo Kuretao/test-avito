@@ -2,13 +2,11 @@ import React, {useState, useMemo} from "react";
 import styled from "styled-components";
 import {
     ResponsiveContainer,
-    LineChart,
-    Line,
     XAxis,
     YAxis,
     CartesianGrid,
     Tooltip,
-    Brush, Area
+    Brush, Area, AreaChart
 } from "recharts";
 
 
@@ -209,7 +207,11 @@ function prepareChartData(filtered) {
     const allDates = [];
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const iso = d.toISOString().slice(0, 10);
-        allDates.push({date: iso, registrations: datesMap.get(iso) || 0});
+        allDates.push({
+            date: iso,
+            registrations: Number(datesMap.get(iso) || 0)
+        });
+
     }
     return allDates;
 }
@@ -230,42 +232,47 @@ const CustomTooltip = ({active, payload, label}) =>
         </StyledTooltip>
     ) : null;
 
-export const RegistrationsChart = ({data}) => (
-    <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={data} margin={{top: 15, right: 10, left: 0, bottom: 15}}>
+export const RegistrationsChart = ({data}) => {
+    console.log(typeof data[0]?.registrations);
 
-            <defs>
-                <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3791e2" stopOpacity={0.6}/>
-                    <stop offset="100%" stopColor="#3791e2" stopOpacity={0}/>
-                </linearGradient>
-            </defs>
+    console.log("Chart data:", data);
+    return(
+        <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={data} margin={{ top: 15, right: 10, left: 0, bottom: 15 }}>
+                <defs>
+                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#3791e2" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#3791e2" stopOpacity={0} />
+                    </linearGradient>
+                </defs>
 
-            <CartesianGrid stroke="#eaf2fb" strokeDasharray="3 3"/>
-            <XAxis dataKey="date" fontSize={13} tick={{fill: '#b0b8c6'}}/>
-            <YAxis fontSize={13} tick={{fill: '#b0b8c6'}} width={40}/>
-            <Tooltip content={<CustomTooltip/>}/>
+                <CartesianGrid stroke="#eaf2fb" strokeDasharray="3 3" />
+                <XAxis dataKey="date" fontSize={13} tick={{ fill: '#b0b8c6' }} />
+                <YAxis fontSize={13} tick={{ fill: '#b0b8c6' }} width={40} />
+                <Tooltip content={<CustomTooltip />} />
 
-            <Area
-                type="monotone"
-                dataKey="registrations"
-                stroke="none"
-                fill="url(#colorGradient)"
-                fillOpacity={1}
-            />
+                <Area
+                    type="monotone"
+                    dataKey="registrations"
+                    stroke="#3791e2"
+                    strokeWidth={2}
+                    fill="url(#colorGradient)"
+                    dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: '#3791e2' }}
+                    activeDot={{ r: 6 }}
+                />
 
-            <Line
-                type="monotone"
-                dataKey="registrations"
-                stroke="#3791e2"
-                strokeWidth={2}
-                dot={{r: 4, stroke: '#fff', strokeWidth: 2, fill: '#3791e2'}}
-                activeDot={{r: 6}}
-            />
-            <Brush dataKey="date" height={26} stroke="#3791e2" travellerWidth={15} fill="#f8fafc"/>
-        </LineChart>
-    </ResponsiveContainer>
-);
+                <Brush
+                    dataKey="date"
+                    height={26}
+                    stroke="#3791e2"
+                    travellerWidth={15}
+                    fill="#f8fafc"
+                />
+            </AreaChart>
+        </ResponsiveContainer>
+)}
+
+
 
 export const ChartsBlock = ({chartData, filter, customDate, onDateChange, onFilterClick}) => {
     return (
