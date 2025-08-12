@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React, {useEffect, useRef, useState} from "react";
-import Input from "../ui/Input.jsx";
+import Input, {PhoneInput} from "../ui/Input.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import {ButtonDefault} from "../ui/Button.jsx";
 import OptionTable from "../ui/Option.jsx";
@@ -68,8 +68,8 @@ const RefHeader = styled.header`
     justify-content: space-between;
     margin-bottom: 16px;
 
-    p{
-        font-family: Manrope,sans-serif;
+    p {
+        font-family: Manrope, sans-serif;
         font-weight: 500;
         font-size: 14px;
         leading-trim: NONE;
@@ -78,9 +78,9 @@ const RefHeader = styled.header`
         font-variant-numeric-figure: lining-nums;
         font-variant-numeric-spacing: proportional-nums;
         color: #475569;
-        
+
         span {
-            font-family: Manrope,sans-serif;
+            font-family: Manrope, sans-serif;
             color: #006999;
         }
     }
@@ -143,27 +143,27 @@ const SearchWrapper = styled.div`
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    
-    &>div>*{
-        margin: 0; 
-        
-        &>input{
+
+    & > div > * {
+        margin: 0;
+
+        & > input {
             border: none;
         }
     }
 `;
 
 const SearchButton = styled.div`
-  height: 40px;
-  overflow: hidden;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  transition: width 0.3s ease;
-  width: ${({ $expanded }) => ($expanded ? "390px" : "40px")};
-  z-index: 10;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    transition: width 0.3s ease;
+    width: ${({$expanded}) => ($expanded ? "390px" : "40px")};
+    z-index: 10;
 `;
 
 const SearchIcon = styled.img`
@@ -176,15 +176,47 @@ const SearchIcon = styled.img`
 
 const AnimatedInput = styled(Input)`
     flex: 1;
-    width: ${({ $expanded }) => ($expanded ? "100%" : "0px")};
-    opacity: ${({ $expanded }) => ($expanded ? 1 : 0)};
+    width: ${({$expanded}) => ($expanded ? "100%" : "0px")};
+    opacity: ${({$expanded}) => ($expanded ? 1 : 0)};
     transition: opacity 0.1s ease 0.1s;
     border: none;
     background: transparent;
+
     &:focus {
         outline: none;
     }
 `;
+
+const SecondVaribleHeader = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    h2 {
+        font-family: Manrope, sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        leading-trim: NONE;
+        line-height: 24px;
+        letter-spacing: 0;
+        font-variant-numeric-figure: lining-nums;
+        font-variant-numeric-spacing: proportional-nums;
+        color: #006999;
+    }
+
+    p {
+        font-family: Manrope, sans-serif;
+        font-weight: 500;
+        font-size: 14px;
+        leading-trim: NONE;
+        line-height: 100%;
+        letter-spacing: 0;
+        font-variant-numeric-figure: lining-nums;
+        font-variant-numeric-spacing: proportional-nums;
+        color: #64748B;
+        width: 70%;
+    }
+`
 
 
 function Referrals() {
@@ -194,6 +226,19 @@ function Referrals() {
     const [searchShow, setSearchShow] = useState(true);
     const [expanded, setExpanded] = useState(false);
     const containerRef = useRef(null);
+    const [phone, setPhone] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+
+    useEffect(() => {
+        if (phone.trim() === "") {
+            setPhoneError("Введите номер телефона");
+        } else {
+            setPhoneError("");
+        }
+    }, [phone]);
+
+    const [name, setName] = useState("");
+    const [addingReferral, setAddingReferral] = useState(false);
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (containerRef.current && !containerRef.current.contains(event.target)) {
@@ -220,27 +265,65 @@ function Referrals() {
 
     return (
         <TableContainer>
-            <RefHeader>
-                <SearchWrapper>
-                    <SearchButton $expanded={expanded} ref={containerRef} onClick={() => setSearchShow(false)}>
-                        {searchShow &&
-                            <SearchIcon
-                                src={searchIcon}
-                                alt="Поиск"
-                                onClick={() => setExpanded((prev) => !prev)}
+            <RefHeader style={{borderBottom: '1px solid #CBD5E1', paddingBottom: '24px'}}>
+                {addingReferral ? (
+                    <SearchWrapper style={{width: "100%"}}>
+                        <SecondVaribleHeader>
+                            <h2>Добавление реферала</h2>
+                            <p>Какой-то не большой поясняющий текст опционально</p>
+                        </SecondVaribleHeader>
+
+                        <div style={{display: "flex", gap: "8px", marginLeft: "auto", alignItems:'end'}}>
+                            <PhoneInput value={phone} onChange={setPhone} error={phoneError}/>
+
+                            <div style={{display: "flex", flexDirection: "column", gap: "4px", minWidth: "200px"}}>
+                                <label style={{fontSize: "14px", fontWeight: "500", color: "#475569"}}>Укажите имя
+                                    клиента *</label>
+                                <input
+                                    style={{
+                                        height: "40px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #CBD5E1",
+                                        padding: "0 8px",
+                                        fontSize: "14px",
+                                        width:260
+                                    }}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Имя"
+                                />
+                            </div>
+
+                            <ButtonDefault
+                                style={{background: "#006999", height: 'max-content'}}
+                                ButtonTitle={"Добавить"}
                             />
-                        }
-                        <AnimatedInput
-                            $expanded={expanded}
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onSearch={onSearch}
-                            placeholder="Поиск"
-                        />
-                    </SearchButton>
-                    <p>Количество пользователей: <span>114</span></p>
-                </SearchWrapper>
-                <ButtonDefault ButtonTitle={"+ Добавить рефералов"}/>
+                        </div>
+                    </SearchWrapper>
+                ) : (
+                    <>
+                        <SearchWrapper>
+                            <SearchButton $expanded={expanded} ref={containerRef} onClick={() => setSearchShow(false)}>
+                                {searchShow && (
+                                    <SearchIcon
+                                        src={searchIcon}
+                                        alt="Поиск"
+                                        onClick={() => setExpanded((prev) => !prev)}
+                                    />
+                                )}
+                                <AnimatedInput
+                                    $expanded={expanded}
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onSearch={onSearch}
+                                    placeholder="Поиск"
+                                />
+                            </SearchButton>
+                            <p>Количество пользователей: <span>114</span></p>
+                        </SearchWrapper>
+                        <ButtonDefault ButtonTitle={"+ Добавить рефералов"} onClick={() => setAddingReferral(true)}/>
+                    </>
+                )}
             </RefHeader>
             <TableWrapper>
                 <TableHead>
@@ -260,7 +343,8 @@ function Referrals() {
                         <Td>
                             <PayoutContainer>
                                 {item.payoutRequest.map((item, idx) => (
-                                    <OptionTable style={{background: "#CCEFFF",color:"#006999"}} key={idx} type={item.type}>{item.label}</OptionTable>
+                                    <OptionTable style={{background: "#CCEFFF", color: "#006999"}} key={idx}
+                                                 type={item.type}>{item.label}</OptionTable>
                                 ))}
                             </PayoutContainer>
                         </Td>

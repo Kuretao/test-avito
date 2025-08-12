@@ -71,7 +71,8 @@ const LinkBlock = styled.div`
                 height: 32px;
             }
             img:hover{
-                background-color: #CCEFFF;
+                background-color: #0069991F;
+                filter: invert(28%) sepia(94%) saturate(1376%) hue-rotate(169deg) brightness(93%) contrast(97%);
             }
         }
     }
@@ -95,7 +96,18 @@ const Promo = styled.div`
     color: #64748B;
 
     span {
-        margin-bottom: 0
+        margin-bottom: 0;
+
+        img{
+        border-radius: 50%;
+        object-fit: scale-down;
+        width: 32px;
+        height: 32px;
+    }
+        img:hover{
+            background-color: #0069991F;
+            filter: invert(28%) sepia(94%) saturate(1376%) hue-rotate(169deg) brightness(93%) contrast(97%);
+        }
     }
 `;
 const Filters = styled.div`
