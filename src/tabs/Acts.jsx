@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import searchIcon from "./../assets/icons/search.svg";
 import pdfIcon from "./../assets/icons/pdf.svg";
 import downloadIcon from "./../assets/icons/download.svg";
+import Input from "../ui/Input.jsx";
 
 const ActsContainer = styled.section`
     display: flex;
@@ -36,21 +37,52 @@ const TopBar = styled.div`
     margin-bottom: 12px;
 `;
 
+const SearchWrapper = styled.div`
+    position: relative;
+    width: 40px; 
+    height: 40px;
+    &>div>*{
+        margin: 0; 
+        
+        &>input{
+            border: none;
+        }
+    }
+`;
 
-const SearchButton = styled.button`
+const SearchButton = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  transition: width 0.3s ease;
+  width: ${({ $expanded }) => ($expanded ? "390px" : "40px")};
+  z-index: 10;
+`;
+
+const SearchIcon = styled.img`
     width: 40px;
     height: 40px;
-    background: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 8px;
     cursor: pointer;
+    object-fit: scale-down;
+`;
 
-    img {
-        width: 18px;
-        height: 18px;
+const AnimatedInput = styled(Input)`
+    flex: 1;
+    width: ${({ $expanded }) => ($expanded ? "100%" : "0px")};
+    opacity: ${({ $expanded }) => ($expanded ? 1 : 0)};
+    transition: opacity 0.1s ease 0.1s;
+    border: none;
+    background: transparent;
+    &:focus {
+        outline: none;
     }
 `;
 
@@ -158,6 +190,20 @@ const actsData = Array(10).fill({
 
 export const Acts = () => {
     const [sortDirection, setSortDirection] = useState("desc");
+    const [searchShow, setSearchShow] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setExpanded(false);
+                setSearchShow(true);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const toggleSort = () => {
         setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -176,9 +222,18 @@ export const Acts = () => {
             <Title>Акты выполненных работ</Title>
             <ActsListContainer>
                 <TopBar>
-                    <SearchButton>
-                        <img src={searchIcon} alt="Поиск"/>
-                    </SearchButton>
+                    <SearchWrapper>
+                        <SearchButton $expanded={expanded} ref={containerRef} onClick={() => setSearchShow(false)} >
+                            {searchShow &&
+                                <SearchIcon
+                                    src={searchIcon}
+                                    alt="Поиск"
+                                    onClick={() => setExpanded((prev) => !prev)}
+                                />
+                            }
+                            <AnimatedInput $expanded={expanded} placeholder="Поиск" />
+                        </SearchButton>
+                    </SearchWrapper>
                     <SortButton onClick={toggleSort}>
                         Дата
                         <SortArrow $direction={sortDirection}/>

@@ -13,8 +13,8 @@ const Button = styled.button`
     font-family: "Manrope", sans-serif;
 `
 
-export const ButtonDefault = ({ButtonTitle}) => {
+export const ButtonDefault = ({ButtonTitle, onClick}) => {
     return (
-        <Button>{ButtonTitle}</Button>
+        <Button onClick={onClick}>{ButtonTitle}</Button>
     )
 }

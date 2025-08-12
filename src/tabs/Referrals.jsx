@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Input from "../ui/Input.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import {ButtonDefault} from "../ui/Button.jsx";
 import OptionTable from "../ui/Option.jsx";
+import searchIcon from "../assets/icons/search.svg";
 
 
 const data = [
@@ -57,7 +58,7 @@ const TableContainer = styled.section`
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px 0 #00466626;
-    background: #FFFFFF80;
+    background: #FFFFFF;
 `
 
 const RefHeader = styled.header`
@@ -67,8 +68,8 @@ const RefHeader = styled.header`
     justify-content: space-between;
     margin-bottom: 16px;
 
-    span {
-        font-family: Raleway,sans-serif;
+    p{
+        font-family: Manrope,sans-serif;
         font-weight: 500;
         font-size: 14px;
         leading-trim: NONE;
@@ -76,7 +77,12 @@ const RefHeader = styled.header`
         letter-spacing: 0;
         font-variant-numeric-figure: lining-nums;
         font-variant-numeric-spacing: proportional-nums;
-        color: #006999;
+        color: #475569;
+        
+        span {
+            font-family: Manrope,sans-serif;
+            color: #006999;
+        }
     }
 `
 const TableWrapper = styled.table`
@@ -132,10 +138,72 @@ const PayoutContainer = styled.div`
 `;
 
 
+const SearchWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    
+    &>div>*{
+        margin: 0; 
+        
+        &>input{
+            border: none;
+        }
+    }
+`;
+
+const SearchButton = styled.div`
+  height: 40px;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  transition: width 0.3s ease;
+  width: ${({ $expanded }) => ($expanded ? "390px" : "40px")};
+  z-index: 10;
+`;
+
+const SearchIcon = styled.img`
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    cursor: pointer;
+    object-fit: scale-down;
+`;
+
+const AnimatedInput = styled(Input)`
+    flex: 1;
+    width: ${({ $expanded }) => ($expanded ? "100%" : "0px")};
+    opacity: ${({ $expanded }) => ($expanded ? 1 : 0)};
+    transition: opacity 0.1s ease 0.1s;
+    border: none;
+    background: transparent;
+    &:focus {
+        outline: none;
+    }
+`;
+
+
 function Referrals() {
     const [searchTerm, setSearchTerm] = useState("");
     const [inputValue, setInputValue] = useState("");
     const [page, setPage] = useState(1);
+    const [searchShow, setSearchShow] = useState(true);
+    const [expanded, setExpanded] = useState(false);
+    const containerRef = useRef(null);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setExpanded(false);
+                setSearchShow(true);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const filteredData = data.filter(
         (item) =>
@@ -153,15 +221,27 @@ function Referrals() {
     return (
         <TableContainer>
             <RefHeader>
-                <span>Количество пользователей: 114</span>
+                <SearchWrapper>
+                    <SearchButton $expanded={expanded} ref={containerRef} onClick={() => setSearchShow(false)}>
+                        {searchShow &&
+                            <SearchIcon
+                                src={searchIcon}
+                                alt="Поиск"
+                                onClick={() => setExpanded((prev) => !prev)}
+                            />
+                        }
+                        <AnimatedInput
+                            $expanded={expanded}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onSearch={onSearch}
+                            placeholder="Поиск"
+                        />
+                    </SearchButton>
+                    <p>Количество пользователей: <span>114</span></p>
+                </SearchWrapper>
                 <ButtonDefault ButtonTitle={"+ Добавить рефералов"}/>
             </RefHeader>
-            <Input
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onSearch={onSearch}
-                placeholder="Поиск"
-            />
             <TableWrapper>
                 <TableHead>
                     <tr>
@@ -180,7 +260,7 @@ function Referrals() {
                         <Td>
                             <PayoutContainer>
                                 {item.payoutRequest.map((item, idx) => (
-                                    <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                    <OptionTable style={{background: "#CCEFFF",color:"#006999"}} key={idx} type={item.type}>{item.label}</OptionTable>
                                 ))}
                             </PayoutContainer>
                         </Td>

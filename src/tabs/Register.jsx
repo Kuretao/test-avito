@@ -8,6 +8,7 @@ import {
     Tooltip,
     Brush, Area, AreaChart
 } from "recharts";
+import copyIcon from "../assets/icons/copy.svg";
 
 
 const Wrapper = styled.div`
@@ -31,6 +32,7 @@ const LinkBlock = styled.div`
     box-shadow: 0 2px 8px 0 #00466626;
     padding: 20px;
     border-radius: 8px;
+    background-color: #fff;
 
     span {
         display: flex;
@@ -47,7 +49,7 @@ const LinkBlock = styled.div`
         font-variant-numeric-figure: lining-nums;
         font-variant-numeric-spacing: proportional-nums;
         color: #64748B;
-        margin-bottom: 6px;
+        
 
         a {
             font-family: Manrope, sans-serif;
@@ -61,6 +63,16 @@ const LinkBlock = styled.div`
             text-decoration-offset: 0;
             text-decoration-thickness: 0;
             color: #00AFFF;
+            
+            img{
+                border-radius: 50%;
+                object-fit: scale-down;
+                width: 32px;
+                height: 32px;
+            }
+            img:hover{
+                background-color: #CCEFFF;
+            }
         }
     }
 `;
@@ -131,7 +143,8 @@ const ChartBlock = styled.div`
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px 0 #00466626;
-    gap: 16px;
+    gap: 16px;    
+    background-color: #fff;
 `
 const Chart = styled.div` /* ... */ `;
 const RegBlock = styled.div`
@@ -140,6 +153,7 @@ const RegBlock = styled.div`
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px 0 #00466626;
+    background-color: #fff;
     gap: 16px;
 `;
 const RegTitle = styled.div`
@@ -355,7 +369,9 @@ const ReferralComponent = () => {
     }, [filtered, customDate]);
 
     const totalRegistrations = chartData.reduce((sum, item) => sum + item.registrations, 0);
-
+    const handleCopy = (text) => {
+        navigator.clipboard.writeText(text);
+    };
     return (
         <Wrapper>
 
@@ -363,19 +379,40 @@ const ReferralComponent = () => {
                 <Title>Реферальная ссылка</Title>
                 <span>
                   С презентацией платформы:
-                  <a href="https://monitoring.b2b-help.ru/partners/?i=27335" target="_blank" rel="noopener noreferrer">
-                    https://monitoring.b2b-help.ru/partners/?i=27335
+                  <a
+                      // href="https://monitoring.b2b-help.ru/partners/?i=27335"
+                      target="_blank" rel="noopener noreferrer" style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      gap: 16,
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      fontFamily: 'Manrope,sans-serif',
+                  }} onClick={() => handleCopy("https://monitoring.b2b-help.ru/partners/?i=27335")}>
+                    https://monitoring.b2b-help.ru/partners/?i=27335 <img src={copyIcon} alt="copy"/>
                   </a>
                 </span>
                 <span>
                   Прямая ссылка на регистрацию:{" "}
-                    <a href="https://monitoring.b2b-help.ru/login.php/?i=27335" target="_blank"
-                       rel="noopener noreferrer">
-                    https://monitoring.b2b-help.ru/login.php/?i=27335
+                    <a
+                        // href="https://monitoring.b2b-help.ru/login.php/?i=27335"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                           display: 'flex',
+                           flexDirection: 'row',
+                           gap: 16,
+                           alignItems: 'center',
+                           cursor: 'pointer',
+                           fontFamily: 'Manrope,sans-serif',
+                       }}
+                        onClick={() => handleCopy("https://monitoring.b2b-help.ru/login.php/?i=27335")}
+                    >
+                    https://monitoring.b2b-help.ru/login.php/?i=27335 <img src={copyIcon} alt="copy"/>
                   </a>
                 </span>
-                <Promo>
-                    Промо для Ваших рефералов: <span>257042</span>
+                <Promo onClick={() => handleCopy("257042")}>
+                    Промо для Ваших рефералов: <span style={{cursor: 'pointer'}}>257042 <img src={copyIcon} alt="copy"/></span>
                 </Promo>
             </LinkBlock>
             <ChartsBlock chartData={chartData} filter={filter} customDate={customDate} onDateChange={onDateChange}

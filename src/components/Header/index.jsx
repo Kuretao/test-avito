@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import {HeaderDataItem} from "./HeaderData.jsx";
 import {ButtonDefault} from "../../ui/Button.jsx";
+import {useState} from "react";
+import {IndexModal} from "../Modal/Index.jsx";
 
 const Data = [
     {
@@ -13,19 +15,19 @@ const Data = [
         id: 2,
         title: 'Баланс на счете',
         question: false,
-        value: "40%",
+        value: <>40 <br/> %</>
     },
     {
         id: 3,
         title: 'Баланс на счете',
         question: false,
-        value: "40%",
+        value: <>40 <br/> %</>
     },
     {
         id: 4,
         title: 'Баланс на счете',
         question: false,
-        value: "40%",
+        value: <>40 %</>
     },
 ]
 
@@ -44,6 +46,11 @@ const HeaderContent = styled.div`
     display: flex;
     flex-direction: row;
     gap: 15px;
+    max-height: 55px;
+    
+    &>div:first-child>div:last-child {
+        color: #006999;
+    }
 `
 
 const HeaderLeftSide = styled.div`
@@ -106,6 +113,8 @@ const HeaderCheckboxLabel = styled.label`
 
 
 function IndexHeader() {
+    const [show, setShow] = useState(false);
+
     return (
         <Header>
             <HeaderContent>
@@ -115,13 +124,15 @@ function IndexHeader() {
             </HeaderContent>
 
             <HeaderLeftSide>
-                <HeaderCheckboxLabel>
-                    <HeaderCheckbox type="checkbox" id="agree" />
-                    <CustomCheckbox />
-                    Ознакомлен с индивидуальным <br /> партнёрским соглашением
-                </HeaderCheckboxLabel>
+                {show &&
+                    <HeaderCheckboxLabel>
+                        <HeaderCheckbox type="checkbox" id="agree" />
+                        <CustomCheckbox/>
+                        Ознакомлен с индивидуальным <br /> партнёрским соглашением
+                    </HeaderCheckboxLabel>
+                }
 
-                <ButtonDefault ButtonTitle={"Запрос на выплату"}/>
+                <ButtonDefault ButtonTitle={show ? 'Запрос на выплату' : 'Продолжить'} onClick={() => setShow(!show)}/>
             </HeaderLeftSide>
         </Header>
     )

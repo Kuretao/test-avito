@@ -9,7 +9,8 @@ import start from '../../assets/icons/Group 656.svg'
 const NavContainer = styled.div`
     margin-top: 24px;
     font-size: 14px;
-    color: #64748b;
+    color: #475569;
+    font-weight: 700;
     display: flex;
     justify-content: end;
     gap: 20px;
@@ -51,12 +52,12 @@ export default function TableNavigation({
 
     return (
         <NavContainer>
-            <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "20px",  fontFamily: 'Manrope,sans-serif' }}>
                 Записей в странице:
                 <Dropdown options={itemsPerPageOptions} value={itemsPerPage} onChange={setItemsPerPage} />
             </div>
 
-            <div>
+            <div style={{ fontFamily: 'Manrope,sans-serif' }}>
                 {`${(page - 1) * itemsPerPage + 1}-${Math.min(page * itemsPerPage, totalRecords)} из ${totalRecords}`}
             </div>
 

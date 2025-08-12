@@ -6,6 +6,7 @@ const DropdownWrapper = styled.div`
     position: relative;
     width: max-content;
     user-select: none;
+    min-width: 110px;
 `;
 
 const DropdownHeader = styled.div`
@@ -19,6 +20,7 @@ const DropdownHeader = styled.div`
     gap: 16px;
     align-items: center;
     color: #64748B;
+    font-family: Manrope,sans-serif;
     font-weight: 500;
     font-size: 14px;
     line-height: 24px;
@@ -27,10 +29,11 @@ const DropdownHeader = styled.div`
 
 const DropdownList = styled.ul`
     position: absolute;
-    top: 100%;
+    transform: translateY(-100%);
+    top: 0;
     left: 0;
     right: 0;
-    background: #FFFFFF80;
+    background: #FFFFFF;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     list-style: none;
@@ -43,10 +46,12 @@ const DropdownList = styled.ul`
 `;
 
 const DropdownItem = styled.li`
+    font-family: Manrope,sans-serif;
+    font-weight: 500;
     height: 40px;
     padding: 12px;
     cursor: pointer;
-    background-color: #FFFFFF80;
+    border-bottom: 1px solid #CBD5E1;
 `;
 
 export function Dropdown({ options, value, onChange }) {

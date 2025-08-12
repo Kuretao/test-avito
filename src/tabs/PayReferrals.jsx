@@ -3,6 +3,8 @@ import {ChartsBlock} from "./Register.jsx";
 import React, {useMemo, useState} from "react";
 import OptionTable from "../ui/Option.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
+import QustionIcon from "../assets/icons/question-circle.svg";
+import {Question} from "../ui/Question.jsx";
 
 const Wrapper = styled.div`
     display: flex;
@@ -90,6 +92,7 @@ const TableHead = styled.thead`
     height: max-content;
 
     & > tr > th {
+        
         font-weight: 700;
         font-size: 14px;
         line-height: 24px;
@@ -219,7 +222,7 @@ export const PayReferrals = () => {
         setPage(1);
         setSearchTerm(inputValue);
     };
-
+    const [show, setShow] = useState(false);
 
     return (
         <Wrapper>
@@ -231,7 +234,7 @@ export const PayReferrals = () => {
                             <th>Дата</th>
                             <th>ID рефералов</th>
                             <th>ID оплаченной услуги</th>
-                            <th>Покупки</th>
+                            <th style={{display:"flex", gap: 8, position:'relative'}}>Покупки <img style={{cursor:'pointer'}} src={QustionIcon} onClick={() => setShow(!show)} alt="QustionIcon"/>{show && <Question style={{marginTop:6, transform: 'translateX(-25%)'}} QuestionText={'Название и категория услуги'} QuestionTitle={'Подробнее в разделе «Правила»'}/> }</th>
                             <th>Цена</th>
                             <th>Статус</th>
                             <th>Вознаграждение</th>
@@ -245,23 +248,23 @@ export const PayReferrals = () => {
                             <Td>{item.id}</Td>
                             <Td>{item.items}</Td>
                             <Td>
-                                <PayoutContainer>
+                                <PayoutContainer >
                                     {item.price.map((item, idx) => (
-                                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                        <OptionTable style={{background: "#CCEFFF",color:"#006999"}} key={idx} type={item.type}>{item.label}</OptionTable>
                                     ))}
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer>
                                     {item.status.map((item, idx) => (
-                                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                        <OptionTable style={{background: "#FFE396",color:"#475569"}} key={idx} type={item.type}>{item.label}</OptionTable>
                                     ))}
                                 </PayoutContainer>
                             </Td>
                             <Td>
-                                <PayoutContainer>
+                                <PayoutContainer >
                                     {item.priceOut.map((item, idx) => (
-                                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                        <OptionTable style={{background: "#FFE396",color:"#475569"}} key={idx} type={item.type}>{item.label}</OptionTable>
                                     ))}
                                 </PayoutContainer>
                             </Td>

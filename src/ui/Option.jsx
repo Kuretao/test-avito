@@ -21,6 +21,6 @@ const OptionWrapper = styled.span`
   ${({ type }) => optionStyles[type] || optionStyles.info}
 `;
 
-export default function OptionTable({ children, type = "info" }) {
-    return <OptionWrapper type={type}>{children}</OptionWrapper>;
+export default function OptionTable({ children, type = "info", style }) {
+    return <OptionWrapper style={style} type={type}>{children}</OptionWrapper>;
 }

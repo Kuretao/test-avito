@@ -1,8 +1,11 @@
 import styled from "styled-components";
 import QustionIcon from "../../assets/icons/question-circle.svg";
 import Money from "../../assets/icons/Group.svg";
+import {useState} from "react";
+import {Question} from "../../ui/Question.jsx";
 
 const DataItem = styled.div`
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -29,7 +32,7 @@ const DataItemContent = styled.div`
     display: flex;
     flex-direction: row;
     gap: 8px;
-    color: #006999;
+    color: #64748B;
     
     font-weight: 600;
     font-size: 16px;
@@ -39,9 +42,10 @@ const DataItemContent = styled.div`
 
 
 export const HeaderDataItem = ({title, question, value, index}) =>{
+    const [show, setShow] = useState(false);
     return (
         <DataItem key={index}>
-            <DataItemTitle>{title} {question ? <img src={QustionIcon} alt="QustionIcon"/> : ''}</DataItemTitle>
+            <DataItemTitle>{title} {question ? <img style={{cursor:'pointer'}} src={QustionIcon} onClick={() => setShow(!show)} alt="QustionIcon"/> : ''}{show && <Question QuestionText={'Начисление за покупку производится 31-й день, после покупки этой услуги'} QuestionTitle={'Сумма начислений.'}/> }</DataItemTitle>
             <DataItemContent>{question ? <img src={Money} alt="Money"/> : ''} {value}</DataItemContent>
         </DataItem>
     )

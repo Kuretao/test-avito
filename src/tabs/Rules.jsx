@@ -97,9 +97,8 @@ const FaqIcon = styled.span`
 
 const FaqAnswer = styled.div`
     border-left: 4px solid #006999;
-    padding: 16px;
-    padding-left: 20px;
-    font-family: Manrope,sans-serif;
+    padding: ${({ $open }) => ($open ? "16px 20px" : "0 20px")};
+    font-family: Manrope, sans-serif;
     font-weight: 500;
     font-size: 15px;
     line-height: 18px;
@@ -108,7 +107,16 @@ const FaqAnswer = styled.div`
     background: #008CCC14;
     font-variant-numeric-figure: lining-nums;
     font-variant-numeric-spacing: proportional-nums;
+    overflow: hidden;
+    white-space: pre-line; 
+    transition:
+            max-height 0.3s ease,
+            padding 0.3s ease,
+            opacity 0.3s ease;
+    max-height: ${({ $open }) => ($open ? "500px" : "0")};
+    opacity: ${({ $open }) => ($open ? 1 : 0)};
 `;
+
 
 const faqs = [
     {
@@ -117,15 +125,44 @@ const faqs = [
     },
     {
         question: "Какой процент по партнерке?",
-        answer: "Размер партнерского вознаграждения устанавливается индивидуально и зависит от условий вашей программы."
+        answer: (
+            <>
+                <strong style={{fontFamily: 'Manrope,sans-serif'}}>Группа 1 (40%)</strong>
+                <ul style={{listStyle: 'disc', paddingLeft: '24px',marginTop: 8, marginBottom: 16}}>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Автостратегия</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Конструктор XML-файла для Автозагрузки</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Центр сообщений</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>АвтоОтвет</li>
+                </ul>
+                <strong style={{fontFamily: 'Manrope,sans-serif'}}>Группа 2 (20%)</strong>
+                <ul style={{listStyle: 'disc', paddingLeft: '24px',marginTop: 8, marginBottom: 16}}>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Мониторинг топ выдачи</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Парсер Анализатор</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Мои конкуренты</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Рассылка</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>ИИ-продавец</li>
+                </ul>
+                <strong style={{fontFamily: 'Manrope,sans-serif'}}>Группа 3 (10%)</strong>
+                <ul style={{listStyle: 'disc', paddingLeft: '24px',marginTop: 8, marginBottom: 16}}>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Центр управления аккаунтами</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Комьюнити</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Бид-менеджер</li>
+                </ul>
+                <strong style={{fontFamily: 'Manrope,sans-serif'}}>Группа 4 (5%)</strong>
+                <ul style={{listStyle: 'disc', paddingLeft: '24px',marginTop: 8}}>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>ПФ</li>
+                    <li style={{fontFamily: 'Manrope,sans-serif'}}>Парсер заголовков</li>
+                </ul>
+            </>
+        )
     },
     {
         question: "Как получить партнерское вознаграждение?",
-        answer: "Партнёрское вознаграждение выплачивается по запросу через личный кабинет платформы. За каждую покупку вашего реферала вы получаете начисление на 31й день после покупки.\n" +
-            "Все начисления суммируются и отображаются в реферальной программе, для вывода партнёрского вознаграждения на банковскую карту необходимо выполнить 3 условия:\n" +
-            "Минимум 3 ваших реферала пользуются сервисом (?)\n" +
-            "Сумма к выводу не менее 5000 рублей\n" +
-            "У вас нет открытых заявок на вывод средств\n" +
+        answer: "Партнёрское вознаграждение выплачивается по запросу через личный кабинет платформы. За каждую покупку вашего реферала вы получаете начисление на 31й день после покупки.\n" + "\n" +
+            "Все начисления суммируются и отображаются в реферальной программе, для вывода партнёрского вознаграждения на банковскую карту необходимо выполнить 3 условия:\n" + "\n" +
+            "1. Минимум 3 ваших реферала пользуются сервисом (?)\n" +
+            "2. Сумма к выводу не менее 5000 рублей\n" +
+            "3. У вас нет открытых заявок на вывод средств\n" +"\n" +
             "Кнопка «Запрос на выплату» активна в период с 1 по 10 число каждого месяца, при соблюдении Партнёром указанных выше условий. Срок выплаты вознаграждения: с 13-го по 20-ое число месяца, следующего за Отчётный периодом."
     },
     {
@@ -158,9 +195,13 @@ const FAQ = () => {
                         onClick={() => setOpenIdx(openIdx === idx ? null : idx)}
                     >
                         {item.question}
-                        <FaqIcon open={openIdx === idx}><img src={arrow} alt="arrow"/></FaqIcon>
+                        <FaqIcon open={openIdx === idx}>
+                            <img src={arrow} alt="arrow" />
+                        </FaqIcon>
                     </FaqQuestion>
-                    {openIdx === idx && <FaqAnswer>{item.answer}</FaqAnswer>}
+                    <FaqAnswer $open={openIdx === idx}>
+                        {item.answer}
+                    </FaqAnswer>
                 </FaqItem>
             ))}
         </FaqList>
