@@ -138,10 +138,12 @@ const PayoutContainer = styled.div`
 `;
 
 const DateWrapper = styled.span`
-    padding: 6px 8px;
+    padding: 4.5px 8px;
     border-radius: 8px;
     background: #E2E8F0;
     font-size: 12px;
+    height: 26px;
+    line-height: 100%;
 `
 
 const registrationsAll = [
