@@ -270,7 +270,6 @@ function Referrals() {
                     <SearchWrapper style={{width: "100%"}}>
                         <SecondVaribleHeader>
                             <h2>Добавление реферала</h2>
-                            <p>Какой-то не большой поясняющий текст опционально</p>
                         </SecondVaribleHeader>
 
                         <div style={{display: "flex", gap: "8px", marginLeft: "auto", alignItems:'end'}}>

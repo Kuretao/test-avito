@@ -438,7 +438,7 @@ const ReferralComponent = () => {
                   </a>
                 </span>
                 <Promo onClick={() => handleCopy("257042")}>
-                    Промо для Ваших рефералов: <span style={{cursor: 'pointer'}}>257042 <img src={copyIcon} alt="copy"/></span>
+                    Промо для Ваших рефералов: <span style={{cursor: 'pointer', fontWeight: 700}}>257042 <img src={copyIcon} alt="copy"/></span>
                 </Promo>
             </LinkBlock>
             <ChartsBlock

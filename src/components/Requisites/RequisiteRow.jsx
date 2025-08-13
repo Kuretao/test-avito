@@ -47,7 +47,7 @@ function ReqValue({ value }) {
                 }}
                 onClick={handleCopy}
             >
-                {value} <img src={copyIcon} alt="copy" />
+                <span style={{display:'none'}}>{value}</span> <img src={copyIcon} alt="copy" />
             </a>
         );
     }

@@ -27,7 +27,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500₽"}
+            {type: "success", label: "500 ₽"}
         ],
     },
     {
@@ -42,7 +42,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500₽"}
+            {type: "success", label: "500 ₽"}
         ],
     },
     {
@@ -57,7 +57,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500₽"}
+            {type: "success", label: "500 ₽"}
         ],
     },
     {
@@ -72,7 +72,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500₽"}
+            {type: "success", label: "500 ₽"}
         ],
     },
 ];
@@ -128,6 +128,7 @@ const Td = styled.td`
     font-size: 14px;
     line-height: 100%;
     color: #64748B;
+    
 `;
 
 const PayoutContainer = styled.div`
@@ -140,6 +141,7 @@ const DateWrapper = styled.span`
     padding: 6px 8px;
     border-radius: 8px;
     background: #E2E8F0;
+    font-size: 12px;
 `
 
 const registrationsAll = [
