@@ -144,7 +144,7 @@ function IndexHeader() {
                         />
                         <CustomCheckbox />
                         <span>
-                            Ознакомленs с <a href="https://b2b-help.ru/individual_partnership_agreement/" target="_blank" rel="noreferrer">
+                            Ознакомлен с <a href="https://b2b-help.ru/individual_partnership_agreement/" target="_blank" rel="noreferrer">
                         индивидуальным <br/> партнёрским соглашением</a>
                         </span>
                     </HeaderCheckboxLabel>
