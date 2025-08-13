@@ -16,7 +16,7 @@ const OrganizationData = [
     { title: "Расчетный счет", value: "98789741651689878974" },
     { title: "Есть презентация на платформе", value: true },
     { title: "Прямая ссылка на регистрацию", value: true },
-    { title: <span>Реферальный промокод: <span style={{marginLeft:28}}>257042</span></span>, value: "257042" },
+    { title: <span>Реферальный промокод: <span style={{marginLeft:28, fontWeight: 700}}>257042</span></span>, value: "257042" },
 ];
 
 
