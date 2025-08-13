@@ -1,70 +1,51 @@
 import styled from "styled-components";
-import {HeaderDataItem} from "./HeaderData.jsx";
-import {ButtonDefault} from "../../ui/Button.jsx";
-import {useState} from "react";
-import {IndexModal} from "../Modal/Index.jsx";
+import { HeaderDataItem } from "./HeaderData.jsx";
+import { ButtonDefault } from "../../ui/Button.jsx";
+import { useState } from "react";
+import axios from "axios";
 
 const Data = [
-    {
-        id: 1,
-        title: 'Баланс на счете',
-        question: true,
-        value: 200,
-    },
-    {
-        id: 2,
-        title: 'Баланс на счете',
-        question: false,
-        value: <>40 <br/> %</>
-    },
-    {
-        id: 3,
-        title: 'Баланс на счете',
-        question: false,
-        value: <>40 <br/> %</>
-    },
-    {
-        id: 4,
-        title: 'Баланс на счете',
-        question: false,
-        value: <>40 %</>
-    },
-]
+    { id: 1, title: 'Баланс на счете', question: true, value: '200 руб.' },
+    { id: 2, title: 'Группа 1', question: false, value: <>40 %</> },
+    { id: 3, title: 'Группа 2', question: false, value: <>40 %</> },
+    { id: 4, title: 'Группа 3', question: false, value: <>40 %</> },
+    { id: 5, title: 'Группа 4', question: false, value: <>40 %</> },
+];
 
 const Header = styled.header`
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background: #FFFFFF80;
+    background: #FFFFFF;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px 0 #00466626;
-`
+`;
 
 const HeaderContent = styled.div`
     display: flex;
     flex-direction: row;
     gap: 15px;
     max-height: 55px;
-    
-    &>div:first-child>div:last-child {
+
+    & > div:first-child > div:last-child {
         color: #006999;
     }
-`
+`;
 
 const HeaderLeftSide = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 16px;
-`
+`;
 
 const HeaderCheckbox = styled.input`
     display: none;
 
     &:checked + span {
-        background: #00AFFF; 
+        background: #00AFFF;
         border-color: #00AFFF;
     }
 
@@ -78,8 +59,8 @@ const CustomCheckbox = styled.span`
     width: 16px;
     height: 16px;
     border-radius: 4px;
-    border: 2px solid #94A3BB; 
-    background: #fff; 
+    border: 2px solid #94A3BB;
+    background: #fff;
     position: relative;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -100,7 +81,7 @@ const CustomCheckbox = styled.span`
 `;
 
 const HeaderCheckboxLabel = styled.label`
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-family: Manrope, sans-serif;
@@ -109,33 +90,81 @@ const HeaderCheckboxLabel = styled.label`
     line-height: 120%;
     color: #475569;
     cursor: pointer;
+    white-space: nowrap; 
+
+    a {
+        color: #006999;
+        display: inline; 
+        white-space: pre-line; 
+    }
 `;
 
 
 function IndexHeader() {
     const [show, setShow] = useState(false);
+    const [checked, setChecked] = useState(false);
+
+    const handleApiRequest = async () => {
+        try {
+            const response = await axios.post("/api/withdraw", { someData: true });
+            console.log("Успех:", response.data);
+        } catch (error) {
+            console.error("Ошибка запроса:", error);
+        }
+    };
+
+    const handleContinueClick = () => {
+        if (checked) {
+            handleApiRequest();
+        }
+    };
 
     return (
         <Header>
             <HeaderContent>
                 {Data.map((item) => (
-                    <HeaderDataItem index={item.id} title={item.title} question={item.question} value={item.value} />
+                    <HeaderDataItem
+                        key={item.id}
+                        index={item.id}
+                        title={item.title}
+                        question={item.question}
+                        value={item.value}
+                    />
                 ))}
             </HeaderContent>
 
             <HeaderLeftSide>
-                {show &&
-                    <HeaderCheckboxLabel>
-                        <HeaderCheckbox type="checkbox" id="agree" />
-                        <CustomCheckbox/>
-                        Ознакомлен с индивидуальным <br /> партнёрским соглашением
+                {show && (
+                    <HeaderCheckboxLabel htmlFor="agree">
+                        <HeaderCheckbox
+                            type="checkbox"
+                            id="agree"
+                            checked={checked}
+                            onChange={(e) => setChecked(e.target.checked)}
+                        />
+                        <CustomCheckbox />
+                        <span>
+                            Ознакомлен с <a href="https://b2b-help.ru/individual_partnership_agreement/" target="_blank" rel="noreferrer">
+                        индивидуальным <br/> партнёрским соглашением</a>
+                        </span>
                     </HeaderCheckboxLabel>
-                }
 
-                <ButtonDefault ButtonTitle={show ? 'Запрос на выплату' : 'Продолжить'} onClick={() => setShow(!show)}/>
+                )}
+
+                <ButtonDefault
+                    ButtonTitle={show ? "Продолжить" : "Запрос на выплату"}
+                    onClick={() => {
+                        if (!show) {
+                            setShow(true);
+                        } else {
+                            handleContinueClick();
+                        }
+                    }}
+                    disabled={show && !checked}
+                />
             </HeaderLeftSide>
         </Header>
-    )
+    );
 }
 
 export default IndexHeader;

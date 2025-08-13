@@ -5,6 +5,8 @@ import OptionTable from "../ui/Option.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import QustionIcon from "../assets/icons/question-circle.svg";
 import {Question} from "../ui/Question.jsx";
+import Input from "../ui/Input.jsx";
+import peopleIcon from "../assets/icons/user-alt.svg";
 
 const Wrapper = styled.div`
     display: flex;
@@ -25,7 +27,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500"}
+            {type: "success", label: "500₽"}
         ],
     },
     {
@@ -40,7 +42,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500"}
+            {type: "success", label: "500₽"}
         ],
     },
     {
@@ -55,7 +57,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500"}
+            {type: "success", label: "500₽"}
         ],
     },
     {
@@ -70,7 +72,7 @@ const data = [
             {type: "success", label: "выплачено"}
         ],
         priceOut: [
-            {type: "success", label: "500"}
+            {type: "success", label: "500₽"}
         ],
     },
 ];
@@ -134,6 +136,12 @@ const PayoutContainer = styled.div`
     flex-wrap: wrap;
 `;
 
+const DateWrapper = styled.span`
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: #E2E8F0;
+`
+
 const registrationsAll = [
     {date: '2024-04-17', count: 1},
     {date: '2024-04-18', count: 1},
@@ -159,36 +167,57 @@ function prepareChartData(filtered) {
 export const PayReferrals = () => {
 
     const [filter, setFilter] = useState("Всё время");
+    const [dateRange, setDateRange] = useState({ start: "", end: "" });
     const [customDate, setCustomDate] = useState("");
-
     const filtered = useMemo(() => {
+        let result = registrationsAll;
         const today = new Date();
+
+        if (dateRange.start && dateRange.end) {
+            const start = new Date(dateRange.start);
+            const end = new Date(dateRange.end);
+            return result.filter((r) => {
+                const current = new Date(r.date);
+                return current >= start && current <= end;
+            });
+        }
+
         switch (filter) {
             case "Сегодня":
-                return registrationsAll.filter(r => r.date === today.toISOString().slice(0, 10));
+                return registrationsAll.filter(
+                    (r) => r.date === today.toISOString().slice(0, 10)
+                );
             case "Вчера":
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
-                return registrationsAll.filter(r => r.date === yesterday.toISOString().slice(0, 10));
+                return registrationsAll.filter(
+                    (r) => r.date === yesterday.toISOString().slice(0, 10)
+                );
             case "Неделя":
                 const weekAgo = new Date(today);
                 weekAgo.setDate(today.getDate() - 7);
-                return registrationsAll.filter(r => new Date(r.date) >= weekAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= weekAgo
+                );
             case "Месяц":
                 const monthAgo = new Date(today);
                 monthAgo.setMonth(today.getMonth() - 1);
-                return registrationsAll.filter(r => new Date(r.date) >= monthAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= monthAgo
+                );
             case "Год":
                 const yearAgo = new Date(today);
                 yearAgo.setFullYear(today.getFullYear() - 1);
-                return registrationsAll.filter(r => new Date(r.date) >= yearAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= yearAgo
+                );
             case "Всё время":
-            case "Placeholder":
-                return registrationsAll;
             default:
                 return registrationsAll;
         }
-    }, [filter]);
+    }, [filter, dateRange]);
+
+    const chartData = useMemo(() => prepareChartData(filtered), [filtered]);
 
     const onFilterClick = value => {
         setFilter(value);
@@ -200,12 +229,6 @@ export const PayReferrals = () => {
         setFilter("");
     };
 
-    const chartData = useMemo(() => {
-        if (customDate) {
-            return prepareChartData(registrationsAll.filter(r => r.date === customDate));
-        }
-        return prepareChartData(filtered);
-    }, [filtered, customDate]);
     const [searchTerm, setSearchTerm] = useState("");
     const [inputValue, setInputValue] = useState("");
     const [page, setPage] = useState(1);
@@ -214,19 +237,31 @@ export const PayReferrals = () => {
         (item) =>
             item.date.includes(searchTerm) ||
             item.amount.includes(searchTerm) ||
-            item.transferTo.includes(searchTerm)
+            (item.transferTo?.includes(searchTerm)) ||
+            item.id.toString().includes(searchTerm)
     );
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    const pagedData = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-    const onSearch = () => {
-        setPage(1);
-        setSearchTerm(inputValue);
-    };
     const [show, setShow] = useState(false);
 
     return (
         <Wrapper>
-            <ChartsBlock chartData={chartData} onDateChange={onDateChange} customDate={customDate} filter={filter} onFilterClick={onFilterClick} />
+            <ChartsBlock
+                chartData={chartData}
+                setFilter={setFilter}
+                setDateRange={setDateRange}
+                onDateChange={onDateChange}
+                customDate={customDate}
+                filter={filter}
+                onFilterClick={onFilterClick}
+            >
+                    <Input
+                        placeholder="ID реферала"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        style={{maxWidth: 206}}
+                        icon={<img src={peopleIcon} alt="icon"/>}
+                    />
+            </ChartsBlock>
             <TableContainer>
                 <TableWrapper>
                     <TableHead>
@@ -241,9 +276,9 @@ export const PayReferrals = () => {
                         </tr>
                     </TableHead>
                     <tbody>
-                    {data.map((item, idx) => (
-                        <Tr>
-                            <Td>{item.date}</Td>
+                    {filteredData.map((item, idx) => (
+                        <Tr key={idx}>
+                            <Td><DateWrapper>{item.date}</DateWrapper></Td>
                             <Td>{item.amount}</Td>
                             <Td>{item.id}</Td>
                             <Td>{item.items}</Td>

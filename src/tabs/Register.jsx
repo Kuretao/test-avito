@@ -9,6 +9,7 @@ import {
     Brush, Area, AreaChart
 } from "recharts";
 import copyIcon from "../assets/icons/copy.svg";
+import {DateRangeInput} from "../ui/Date.jsx";
 
 
 const Wrapper = styled.div`
@@ -49,7 +50,7 @@ const LinkBlock = styled.div`
         font-variant-numeric-figure: lining-nums;
         font-variant-numeric-spacing: proportional-nums;
         color: #64748B;
-        
+
 
         a {
             font-family: Manrope, sans-serif;
@@ -63,14 +64,15 @@ const LinkBlock = styled.div`
             text-decoration-offset: 0;
             text-decoration-thickness: 0;
             color: #00AFFF;
-            
-            img{
+
+            img {
                 border-radius: 50%;
                 object-fit: scale-down;
                 width: 32px;
                 height: 32px;
             }
-            img:hover{
+
+            img:hover {
                 background-color: #0069991F;
                 filter: invert(28%) sepia(94%) saturate(1376%) hue-rotate(169deg) brightness(93%) contrast(97%);
             }
@@ -98,13 +100,14 @@ const Promo = styled.div`
     span {
         margin-bottom: 0;
 
-        img{
-        border-radius: 50%;
-        object-fit: scale-down;
-        width: 32px;
-        height: 32px;
-    }
-        img:hover{
+        img {
+            border-radius: 50%;
+            object-fit: scale-down;
+            width: 32px;
+            height: 32px;
+        }
+
+        img:hover {
             background-color: #0069991F;
             filter: invert(28%) sepia(94%) saturate(1376%) hue-rotate(169deg) brightness(93%) contrast(97%);
         }
@@ -155,7 +158,7 @@ const ChartBlock = styled.div`
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 8px 0 #00466626;
-    gap: 16px;    
+    gap: 16px;
     background-color: #fff;
 `
 const Chart = styled.div` /* ... */ `;
@@ -225,9 +228,10 @@ const registrationsAll = [
 ];
 
 
+
 function prepareChartData(filtered) {
     if (filtered.length === 0) return [];
-    const datesMap = new Map(filtered.map(({date, count}) => [date, count]));
+    const datesMap = new Map(filtered.map(({ date, count }) => [date, count]));
     const start = new Date(filtered[0].date);
     const end = new Date(filtered[filtered.length - 1].date);
     const allDates = [];
@@ -235,9 +239,8 @@ function prepareChartData(filtered) {
         const iso = d.toISOString().slice(0, 10);
         allDates.push({
             date: iso,
-            registrations: Number(datesMap.get(iso) || 0)
+            registrations: Number(datesMap.get(iso) || 0),
         });
-
     }
     return allDates;
 }
@@ -262,20 +265,20 @@ export const RegistrationsChart = ({data}) => {
     console.log(typeof data[0]?.registrations);
 
     console.log("Chart data:", data);
-    return(
+    return (
         <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={data} margin={{ top: 15, right: 10, left: 0, bottom: 15 }}>
+            <AreaChart data={data} margin={{top: 15, right: 10, left: 0, bottom: 15}}>
                 <defs>
                     <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3791e2" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="#3791e2" stopOpacity={0} />
+                        <stop offset="0%" stopColor="#3791e2" stopOpacity={0.4}/>
+                        <stop offset="100%" stopColor="#3791e2" stopOpacity={0}/>
                     </linearGradient>
                 </defs>
 
-                <CartesianGrid stroke="#eaf2fb" strokeDasharray="3 3" />
-                <XAxis dataKey="date" fontSize={13} tick={{ fill: '#b0b8c6' }} />
-                <YAxis fontSize={13} tick={{ fill: '#b0b8c6' }} width={40} />
-                <Tooltip content={<CustomTooltip />} />
+                <CartesianGrid stroke="#eaf2fb" strokeDasharray="3 3"/>
+                <XAxis dataKey="date" fontSize={13} tick={{fill: '#b0b8c6'}}/>
+                <YAxis fontSize={13} tick={{fill: '#b0b8c6'}} width={40}/>
+                <Tooltip content={<CustomTooltip/>}/>
 
                 <Area
                     type="monotone"
@@ -283,8 +286,8 @@ export const RegistrationsChart = ({data}) => {
                     stroke="#3791e2"
                     strokeWidth={2}
                     fill="url(#colorGradient)"
-                    dot={{ r: 4, stroke: '#fff', strokeWidth: 2, fill: '#3791e2' }}
-                    activeDot={{ r: 6 }}
+                    dot={{r: 4, stroke: '#fff', strokeWidth: 2, fill: '#3791e2'}}
+                    activeDot={{r: 6}}
                 />
 
                 <Brush
@@ -296,91 +299,102 @@ export const RegistrationsChart = ({data}) => {
                 />
             </AreaChart>
         </ResponsiveContainer>
-)}
-
-
-
-export const ChartsBlock = ({chartData, filter, customDate, onDateChange, onFilterClick}) => {
-    return (
-        <ChartBlock>
-            <Filters>
-                {["Сегодня", "Вчера", "Неделя", "Месяц", "Год", "Всё время", "Placeholder"].map(value => (
-                    <FilterButton
-                        key={value}
-                        className={filter === value ? "active" : ""}
-                        onClick={() => onFilterClick(value)}
-                    >
-                        {value}
-                    </FilterButton>
-                ))}
-                <input
-                    type="date"
-                    value={customDate}
-                    onChange={onDateChange}
-                />
-            </Filters>
-            <Chart>
-                <RegistrationsChart data={chartData}/>
-            </Chart>
-        </ChartBlock>
-    );
+    )
 }
+
+
+export const ChartsBlock = ({ chartData, filter, setFilter, setDateRange, children }) => {
+
+
+    return (
+        <div>
+            <Filters>
+                {["Сегодня", "Вчера", "Неделя", "Месяц", "Год", "Всё время"].map(
+                    (value) => (
+                        <FilterButton
+                            key={value}
+                            className={filter === value ? "active" : ""}
+                            onClick={() => {
+                                setFilter(value);
+                                setDateRange({ start: "", end: "" });
+                            }}
+                        >
+                            {value}
+                        </FilterButton>
+                    )
+                )}
+                <DateRangeInput
+                    onChange={({ start, end }) => {
+                        setDateRange({ start, end });
+                        setFilter("");
+                    }}
+                />
+                {children}
+            </Filters>
+            <RegistrationsChart data={chartData} />
+        </div>
+    );
+};
 
 
 const ReferralComponent = () => {
     const [filter, setFilter] = useState("Всё время");
-    const [customDate, setCustomDate] = useState("");
-
+    const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
     const filtered = useMemo(() => {
+        let result = registrationsAll;
         const today = new Date();
+
+        if (dateRange.start && dateRange.end) {
+            const start = new Date(dateRange.start);
+            const end = new Date(dateRange.end);
+            return result.filter((r) => {
+                const current = new Date(r.date);
+                return current >= start && current <= end;
+            });
+        }
+
         switch (filter) {
             case "Сегодня":
-                return registrationsAll.filter(r => r.date === today.toISOString().slice(0, 10));
+                return registrationsAll.filter(
+                    (r) => r.date === today.toISOString().slice(0, 10)
+                );
             case "Вчера":
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
-                return registrationsAll.filter(r => r.date === yesterday.toISOString().slice(0, 10));
+                return registrationsAll.filter(
+                    (r) => r.date === yesterday.toISOString().slice(0, 10)
+                );
             case "Неделя":
                 const weekAgo = new Date(today);
                 weekAgo.setDate(today.getDate() - 7);
-                return registrationsAll.filter(r => new Date(r.date) >= weekAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= weekAgo
+                );
             case "Месяц":
                 const monthAgo = new Date(today);
                 monthAgo.setMonth(today.getMonth() - 1);
-                return registrationsAll.filter(r => new Date(r.date) >= monthAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= monthAgo
+                );
             case "Год":
                 const yearAgo = new Date(today);
                 yearAgo.setFullYear(today.getFullYear() - 1);
-                return registrationsAll.filter(r => new Date(r.date) >= yearAgo);
+                return registrationsAll.filter(
+                    (r) => new Date(r.date) >= yearAgo
+                );
             case "Всё время":
-            case "Placeholder":
-                return registrationsAll;
             default:
                 return registrationsAll;
         }
-    }, [filter]);
+    }, [filter, dateRange]);
 
+    const chartData = useMemo(() => prepareChartData(filtered), [filtered]);
+    const totalRegistrations = chartData.reduce(
+        (sum, item) => sum + item.registrations,
+        0
+    );
 
-    const onFilterClick = value => {
-        setFilter(value);
-        setCustomDate("");
-    };
-
-    const onDateChange = e => {
-        setCustomDate(e.target.value);
-        setFilter("");
-    };
-
-
-    const chartData = useMemo(() => {
-        if (customDate) {
-            return prepareChartData(registrationsAll.filter(r => r.date === customDate));
-        }
-        return prepareChartData(filtered);
-    }, [filtered, customDate]);
-
-    const totalRegistrations = chartData.reduce((sum, item) => sum + item.registrations, 0);
     const handleCopy = (text) => {
         navigator.clipboard.writeText(text);
     };
@@ -411,13 +425,13 @@ const ReferralComponent = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
-                           display: 'flex',
-                           flexDirection: 'row',
-                           gap: 16,
-                           alignItems: 'center',
-                           cursor: 'pointer',
-                           fontFamily: 'Manrope,sans-serif',
-                       }}
+                            display: 'flex',
+                            flexDirection: 'row',
+                            gap: 16,
+                            alignItems: 'center',
+                            cursor: 'pointer',
+                            fontFamily: 'Manrope,sans-serif',
+                        }}
                         onClick={() => handleCopy("https://monitoring.b2b-help.ru/login.php/?i=27335")}
                     >
                     https://monitoring.b2b-help.ru/login.php/?i=27335 <img src={copyIcon} alt="copy"/>
@@ -427,8 +441,13 @@ const ReferralComponent = () => {
                     Промо для Ваших рефералов: <span style={{cursor: 'pointer'}}>257042 <img src={copyIcon} alt="copy"/></span>
                 </Promo>
             </LinkBlock>
-            <ChartsBlock chartData={chartData} filter={filter} customDate={customDate} onDateChange={onDateChange}
-                         onFilterClick={onFilterClick}/>
+            <ChartsBlock
+                chartData={chartData}
+                filter={filter}
+                setFilter={setFilter}
+                setDateRange={setDateRange}
+            />
+
             <RegBlock>
                 <RegTitle>Количество регистраций: {totalRegistrations}</RegTitle>
                 <RegList>

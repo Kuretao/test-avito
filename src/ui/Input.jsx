@@ -35,9 +35,9 @@ const SearchButton = styled.button`
     padding: 0;
 `;
 
-export default function Input({ value, onChange, onSearch, placeholder }) {
+export default function Input({ value, style, onChange, onSearch, placeholder, icon }) {
     return (
-        <InputWrapper>
+        <InputWrapper style={style}>
             <InputStyled
                 type="text"
                 value={value}
@@ -48,7 +48,7 @@ export default function Input({ value, onChange, onSearch, placeholder }) {
                 }}
             />
             <SearchButton onClick={onSearch} aria-label="Search">
-                <img src={SearchIcon} alt="search-icon"/>
+                {icon ? icon : < img src={SearchIcon} alt="search-icon"/>}
             </SearchButton>
         </InputWrapper>
     );

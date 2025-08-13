@@ -11,10 +11,15 @@ const Button = styled.button`
     padding: 8px 14px;
     border-radius: 8px;
     font-family: "Manrope", sans-serif;
+
+    &:disabled {
+        background: #E2E8F0!important; 
+        cursor: not-allowed;
+    }
 `
 
-export const ButtonDefault = ({ButtonTitle, onClick, style}) => {
+export const ButtonDefault = ({ButtonTitle, onClick, style,disabled}) => {
     return (
-        <Button style={style} onClick={onClick}>{ButtonTitle}</Button>
+        <Button style={style} disabled={disabled} onClick={onClick}>{ButtonTitle}</Button>
     )
 }

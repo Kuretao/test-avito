@@ -48,7 +48,7 @@ const TableContainer = styled.section`
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 8px 0 #00466626;
-    background: #FFFFFF80;
+    background: #FFFFFF;
 `
 
 export default function Index() {
