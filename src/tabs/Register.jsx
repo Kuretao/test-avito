@@ -307,7 +307,7 @@ export const ChartsBlock = ({ chartData, filter, setFilter, setDateRange, childr
 
 
     return (
-        <div>
+        <ChartBlock>
             <Filters>
                 {["Сегодня", "Вчера", "Неделя", "Месяц", "Год", "Всё время"].map(
                     (value) => (
@@ -332,7 +332,7 @@ export const ChartsBlock = ({ chartData, filter, setFilter, setDateRange, childr
                 {children}
             </Filters>
             <RegistrationsChart data={chartData} />
-        </div>
+        </ChartBlock>
     );
 };
 
