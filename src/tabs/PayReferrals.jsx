@@ -1,81 +1,19 @@
 import styled from "styled-components";
 import {ChartsBlock} from "./Register.jsx";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import OptionTable from "../ui/Option.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import QustionIcon from "../assets/icons/question-circle.svg";
 import {Question} from "../ui/Question.jsx";
 import Input from "../ui/Input.jsx";
 import peopleIcon from "../assets/icons/user-alt.svg";
+import {getPartnerData} from "../api/apiMetods.js";
 
 const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
 `;
-
-const data = [
-    {
-        date: "05.02.2024 11:31",
-        amount: "13212",
-        id: 42000,
-        items: '10 акк.',
-        price: [
-            {type: "success", label: "1300 ₽"}
-        ],
-        status: [
-            {type: "success", label: "выплачено"}
-        ],
-        priceOut: [
-            {type: "success", label: "500 ₽"}
-        ],
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "13212",
-        id: 42000,
-        items: '10 акк.',
-        price: [
-            {type: "success", label: "1300 ₽"}
-        ],
-        status: [
-            {type: "success", label: "выплачено"}
-        ],
-        priceOut: [
-            {type: "success", label: "500 ₽"}
-        ],
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "13212",
-        id: 42000,
-        items: '10 акк.',
-        price: [
-            {type: "success", label: "1300 ₽"}
-        ],
-        status: [
-            {type: "success", label: "выплачено"}
-        ],
-        priceOut: [
-            {type: "success", label: "500 ₽"}
-        ],
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "13212",
-        id: 42000,
-        items: '10 акк.',
-        price: [
-            {type: "success", label: "1300 ₽"}
-        ],
-        status: [
-            {type: "success", label: "выплачено"}
-        ],
-        priceOut: [
-            {type: "success", label: "500 ₽"}
-        ],
-    },
-];
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -146,14 +84,6 @@ const DateWrapper = styled.span`
     line-height: 100%;
 `
 
-const registrationsAll = [
-    {date: '2024-04-17', count: 1},
-    {date: '2024-04-18', count: 1},
-    {date: '2024-04-29', count: 1},
-    {date: '2024-04-30', count: 1},
-    {date: '2024-05-03', count: 2},
-    {date: '2024-05-08', count: 1},
-];
 
 function prepareChartData(filtered) {
     if (filtered.length === 0) return [];
@@ -169,12 +99,35 @@ function prepareChartData(filtered) {
 }
 
 export const PayReferrals = () => {
-
     const [filter, setFilter] = useState("Всё время");
     const [dateRange, setDateRange] = useState({ start: "", end: "" });
     const [customDate, setCustomDate] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [page, setPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [show, setShow] = useState(false);
+
+    const [payToReferral, setPayToReferral] = useState([]);
+    const [registrations, setRegistrations] = useState([]);
+
+    useEffect(() => {
+        getPartnerData().then(({ data }) => {
+            setPayToReferral(data.payToReferral || []);
+
+            const registrationsMapped = (data.payToReferral || []).map((p) => {
+                const [day, month, year] = p.date.split(".");
+                return {
+                    date: `${year}-${month}-${day}`,
+                    count: 1,
+                };
+            });
+
+            setRegistrations(registrationsMapped);
+        });
+    }, []);
+
     const filtered = useMemo(() => {
-        let result = registrationsAll;
+        let result = registrations;
         const today = new Date();
 
         if (dateRange.start && dateRange.end) {
@@ -188,38 +141,38 @@ export const PayReferrals = () => {
 
         switch (filter) {
             case "Сегодня":
-                return registrationsAll.filter(
+                return registrations.filter(
                     (r) => r.date === today.toISOString().slice(0, 10)
                 );
             case "Вчера":
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
-                return registrationsAll.filter(
+                return registrations.filter(
                     (r) => r.date === yesterday.toISOString().slice(0, 10)
                 );
             case "Неделя":
                 const weekAgo = new Date(today);
                 weekAgo.setDate(today.getDate() - 7);
-                return registrationsAll.filter(
+                return registrations.filter(
                     (r) => new Date(r.date) >= weekAgo
                 );
             case "Месяц":
                 const monthAgo = new Date(today);
                 monthAgo.setMonth(today.getMonth() - 1);
-                return registrationsAll.filter(
+                return registrations.filter(
                     (r) => new Date(r.date) >= monthAgo
                 );
             case "Год":
                 const yearAgo = new Date(today);
                 yearAgo.setFullYear(today.getFullYear() - 1);
-                return registrationsAll.filter(
+                return registrations.filter(
                     (r) => new Date(r.date) >= yearAgo
                 );
             case "Всё время":
             default:
-                return registrationsAll;
+                return registrations;
         }
-    }, [filter, dateRange]);
+    }, [filter, dateRange, registrations]);
 
     const chartData = useMemo(() => prepareChartData(filtered), [filtered]);
 
@@ -233,19 +186,15 @@ export const PayReferrals = () => {
         setFilter("");
     };
 
-    const [searchTerm, setSearchTerm] = useState("");
-    const [inputValue, setInputValue] = useState("");
-    const [page, setPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
-    const filteredData = data.filter(
+    const filteredData = payToReferral.filter(
         (item) =>
             item.date.includes(searchTerm) ||
-            item.amount.includes(searchTerm) ||
-            (item.transferTo?.includes(searchTerm)) ||
-            item.id.toString().includes(searchTerm)
+            item.id_ref.toString().includes(searchTerm) ||
+            item.id_pay.toString().includes(searchTerm) ||
+            (item.name_ref?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    const [show, setShow] = useState(false);
 
     return (
         <Wrapper>
@@ -258,13 +207,13 @@ export const PayReferrals = () => {
                 filter={filter}
                 onFilterClick={onFilterClick}
             >
-                    <Input
-                        placeholder="ID реферала"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{maxWidth: 206}}
-                        icon={<img src={peopleIcon} alt="icon"/>}
-                    />
+                <Input
+                    placeholder="ID реферала"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{maxWidth: 206}}
+                    icon={<img src={peopleIcon} alt="icon"/>}
+                />
             </ChartsBlock>
             <TableContainer>
                 <TableWrapper>
@@ -283,28 +232,22 @@ export const PayReferrals = () => {
                     {filteredData.map((item, idx) => (
                         <Tr key={idx}>
                             <Td><DateWrapper>{item.date}</DateWrapper></Td>
-                            <Td>{item.amount}</Td>
-                            <Td>{item.id}</Td>
-                            <Td>{item.items}</Td>
+                            <Td>{item.id_ref}</Td>
+                            <Td>{item.id_pay}</Td>
+                            <Td>{item.name_ref}</Td>
                             <Td>
                                 <PayoutContainer >
-                                    {item.price.map((item, idx) => (
-                                        <OptionTable style={{background: "#CCEFFF",color:"#006999"}} key={idx} type={item.type}>{item.label}</OptionTable>
-                                    ))}
+                                        <OptionTable style={{background: "#CCEFFF",color:"#006999"}}>{item.sum_pay}</OptionTable>
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer>
-                                    {item.status.map((item, idx) => (
-                                        <OptionTable style={{background: "#FFE396",color:"#475569"}} key={idx} type={item.type}>{item.label}</OptionTable>
-                                    ))}
+                                        <OptionTable style={{background: "#FFE396",color:"#475569"}}>{item.status}</OptionTable>
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer >
-                                    {item.priceOut.map((item, idx) => (
-                                        <OptionTable style={{background: "#FFE396",color:"#475569"}} key={idx} type={item.type}>{item.label}</OptionTable>
-                                    ))}
+                                        <OptionTable style={{background: "#FFE396",color:"#475569"}}>{item.reward} ₽</OptionTable>
                                 </PayoutContainer>
                             </Td>
                         </Tr>
