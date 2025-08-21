@@ -1,24 +1,7 @@
 import styled from "styled-components";
 import {RequisitesRow} from "./RequisiteRow.jsx";
-
-
-const OrganizationData = [
-    { title: "Название организации", value: "Имя" },
-    { title: "ФИО", value: "Имя Фамилия Отчество" },
-    { title: "Юридический статус", value: "ИП" },
-    { title: "ИНН", value: "987974165168" },
-    { title: "Email", value: "mail@mail.ru" },
-    { title: "Телефон", value: "+7 (987) 654-32-10" },
-    { title: "Система налогообложения", value: "без НДС" },
-    { title: "БИК", value: "974165168" },
-    { title: "Название банка", value: "Россельхоз банк" },
-    { title: "Корреспондентский счет", value: "987 89 741 6 5168 0000000" },
-    { title: "Расчетный счет", value: "98789741651689878974" },
-    { title: "Есть презентация на платформе", value: true },
-    { title: "Прямая ссылка на регистрацию", value: true },
-    { title: <span>Реферальный промокод: <span style={{marginLeft:28, fontWeight: 700}}>257042</span></span>, value: "257042" },
-];
-
+import {getPartnerData} from "../../api/apiMetods.js";
+import {useEffect, useState} from "react";
 
 const RequisitesContainer = styled.section`
     display: flex;
@@ -62,10 +45,51 @@ const RequisitesColumn = styled.div`
     gap: 4px;
 `
 
-const firstColumnData = OrganizationData.slice(0, OrganizationData.length - 3);
-const secondColumnData = OrganizationData.slice(-3);
-
 function Requisites() {
+    const [organizationData, setOrganizationData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [contactId, setContactId] = useState(null);
+    useEffect(() => {
+        getPartnerData()
+            .then(res => {
+                const partner = res.data.partner_data;
+
+                const formattedData = [
+                    { title: "Название организации", value: partner.NAME },
+                    { title: "ФИО", value: partner.RQ_NAME },
+                    { title: "Юридический статус", value: partner.NAME },
+                    { title: "ИНН", value: partner.RQ_INN },
+                    { title: "Email", value: partner.email },
+                    { title: "Телефон", value: partner.phone },
+                    { title: "Система налогообложения", value: partner.UF_CRM_1754332172 },
+                    { title: "БИК", value: partner.RQ_BIK },
+                    { title: "Название банка", value: partner.RQ_BANK_NAME },
+                    { title: "Корреспондентский счет", value: partner.RQ_COR_ACC_NUM },
+                    { title: "Расчетный счет", value: partner.RQ_ACC_NUM },
+                    { title: "Есть презентация на платформе", value: true },
+                    { title: "Прямая ссылка на регистрацию", value: true },
+                    {
+                        title: (
+                            <span>
+                          Реферальный промокод:{" "}
+                        </span>
+                        ),
+                        value: partner.contact_id
+                    },
+                ];
+                setContactId(String(partner.contact_id));
+                setOrganizationData(formattedData);
+            })
+            .catch(err => console.error("Ошибка получения реквизитов:", err))
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <p>Загрузка реквизитов...</p>;
+
+    const firstColumnData = organizationData.slice(0, organizationData.length - 3);
+    const secondColumnData = organizationData.slice(-3);
+
+
     return (
         <RequisitesContainer>
             <RequisitesTitle>Реквизиты организации</RequisitesTitle>
@@ -79,7 +103,7 @@ function Requisites() {
                 <hr/>
                 <RequisitesColumn style={{marginLeft:32}}>
                     {secondColumnData.map(({ title, value }, index) => (
-                        <RequisitesRow key={index} title={title} value={value} />
+                        <RequisitesRow key={index} title={title} value={value} contact_id={contactId} />
                     ))}
                 </RequisitesColumn>
             </RequisitesContent>

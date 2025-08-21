@@ -25,29 +25,27 @@ const RequisiteRowContent = styled.span`
     color: #64748B;
 `
 
-function ReqValue({ value }) {
+function ReqValue({ value,contactId }) {
     if (value === true) {
         return <a href={value}><img style={{ width: 18, height: 18,cursor: 'pointer', }} src={link} alt="" /></a>;
     }
-
-    if (value === "257042") {
-        const handleCopy = () => {
-            navigator.clipboard.writeText(value)
-        };
+    if (value === contactId) {
+        const handleCopy = () => navigator.clipboard.writeText(value);
 
         return (
             <a
                 style={{
-                    display: 'flex',
-                    flexDirection: 'row',
+                    display: "flex",
+                    flexDirection: "row",
                     gap: 16,
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    fontFamily: 'Manrope,sans-serif',
+                    alignItems: "center",
+                    cursor: "pointer",
+                    fontFamily: "Manrope,sans-serif",
                 }}
                 onClick={handleCopy}
             >
-                <span style={{display:'none'}}>{value}</span> <img src={copyIcon} alt="copy" />
+                <span style={{ display: "none" }}>{value}</span>
+                <img src={copyIcon} alt="copy" />
             </a>
         );
     }

@@ -5,54 +5,7 @@ import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import {ButtonDefault} from "../ui/Button.jsx";
 import OptionTable from "../ui/Option.jsx";
 import searchIcon from "../assets/icons/search.svg";
-
-
-const data = [
-    {
-        date: "05.02.2024 11:31",
-        amount: "29999",
-        payoutRequest: [
-            {type: "info", label: "1 300 ₽"}
-        ],
-        transferTo: [
-            {type: "success", label: "300 ₽"}
-        ],
-        status: "Вакансии Крд Петров - акк № 3",
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "29999",
-        payoutRequest: [
-            {type: "info", label: "1 300 ₽"}
-        ],
-        transferTo: [
-            {type: "success", label: "300 ₽"}
-        ],
-        status: "Вакансии Крд Петров - акк № 3",
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "29999",
-        payoutRequest: [
-            {type: "info", label: "1 300 ₽"}
-        ],
-        transferTo: [
-            {type: "success", label: "300 ₽"}
-        ],
-        status: "Вакансии Крд Петров - акк № 3",
-    },
-    {
-        date: "05.02.2024 11:31",
-        amount: "29999",
-        payoutRequest: [
-            {type: "info", label: "1 300 ₽"}
-        ],
-        transferTo: [
-            {type: "success", label: "300 ₽"}
-        ],
-        status: "Вакансии Крд Петров - акк № 3",
-    },
-];
+import {getPartnerData} from "../api/apiMetods.js";
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -228,6 +181,9 @@ function Referrals() {
     const containerRef = useRef(null);
     const [phone, setPhone] = useState("");
     const [phoneError, setPhoneError] = useState("");
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (phone.trim() === "") {
@@ -236,6 +192,34 @@ function Referrals() {
             setPhoneError("");
         }
     }, [phone]);
+
+
+    useEffect(() => {
+        getPartnerData()
+            .then((res) => {
+                const referrals = res.data.referral_stats?.referral || [];
+                const statsByDate = res.data.referral_stats?.stats_by_date || {};
+
+                const dates = Object.keys(statsByDate);
+
+                const formatted = referrals.map((r, idx) => ({
+                    date: dates[idx] || "-",
+                    amount: r.referral_id,
+                    payoutRequest: [{ type: "info", label: `${r.total_amount} ₽` }],
+                    transferTo: [{ type: "success", label: `${r.total_reward} ₽` }],
+                    status: r.name
+                }));
+
+                setData(formatted);
+            })
+            .catch((err) => {
+                console.error("Ошибка загрузки рефералов:", err);
+                setError("Не удалось загрузить данные рефералов");
+            })
+            .finally(() => setLoading(false));
+    }, []);
+
+
 
     const [name, setName] = useState("");
     const [addingReferral, setAddingReferral] = useState(false);
@@ -252,9 +236,9 @@ function Referrals() {
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const filteredData = data.filter(
         (item) =>
-            item.date.includes(searchTerm) ||
-            item.amount.includes(searchTerm) ||
-            item.transferTo.includes(searchTerm)
+            item.date?.includes(searchTerm) ||
+            item.amount?.toString().includes(searchTerm) ||
+            item.status?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const pagedData = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -262,6 +246,8 @@ function Referrals() {
         setPage(1);
         setSearchTerm(inputValue);
     };
+    if (loading) return <p>Загрузка рефералов...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <TableContainer>
@@ -331,7 +317,7 @@ function Referrals() {
                         <th>ID рефералов</th>
                         <th>Сумма покупок</th>
                         <th>Сумма вознаграждений</th>
-                        <th>Имя</th>
+                        <th style={{maxWidth: 'max-content'}}>Имя</th>
                     </tr>
                 </TableHead>
                 <tbody>
@@ -354,7 +340,7 @@ function Referrals() {
                                 ))}
                             </PayoutContainer>
                         </Td>
-                        <Td>
+                        <Td style={{maxWidth: '266px'}}>
                             {item.status}
                         </Td>
                     </Tr>
