@@ -106,11 +106,12 @@ export const PayReferrals = () => {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [show, setShow] = useState(false);
-
+    const [loading, setLoading] = useState(true);
     const [payToReferral, setPayToReferral] = useState([]);
     const [registrations, setRegistrations] = useState([]);
 
     useEffect(() => {
+        setLoading(true);
         getPartnerData().then(({ data }) => {
             setPayToReferral(data.payToReferral || []);
 
@@ -123,7 +124,7 @@ export const PayReferrals = () => {
             });
 
             setRegistrations(registrationsMapped);
-        });
+        }).finally(() => setLoading(false));
     }, []);
 
     const filtered = useMemo(() => {
@@ -195,7 +196,7 @@ export const PayReferrals = () => {
     );
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
+    if (loading) return <p>Загрузка данных...</p>;
     return (
         <Wrapper>
             <ChartsBlock

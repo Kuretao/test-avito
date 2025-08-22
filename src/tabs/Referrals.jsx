@@ -6,6 +6,8 @@ import {ButtonDefault} from "../ui/Button.jsx";
 import OptionTable from "../ui/Option.jsx";
 import searchIcon from "../assets/icons/search.svg";
 import {getPartnerData} from "../api/apiMetods.js";
+import api from "../api/apiAxios.js";
+import Cookies from "js-cookie";
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -193,13 +195,85 @@ function Referrals() {
         }
     }, [phone]);
 
+    const [errorMsg, setErrorMsg] = useState("");
+
+    const addReferral = async () => {
+        if (!name.trim() || !phone.trim()) {
+            setPhoneError("Заполните все поля");
+            return;
+        }
+
+        const normalizePhone = (phone) => {
+            return phone.replace(/[^\d+]/g, "");
+        };
+
+        const payload = {
+            user_id: 16511,
+            user_name: name,
+            user_phone: normalizePhone(phone),
+            user_paymenttype: "Выплата",
+            user_amount: 5000,
+            user_balance: 7000,
+            user_inn: "91023336453",
+            user_accountID: "16511",
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+        };
+
+
+        console.log("Отправляем payload:", payload);
+
+        try {
+            const res = await api.post("/add_ref", payload, {
+                headers: { "Content-Type": "application/json" }
+            });
+            console.log("Реферал добавлен:", res.data);
+
+            setData((prev) => [
+                ...prev,
+                {
+                    date: new Date().toLocaleString(),
+                    amount: payload.user_id,
+                    payoutRequest: [{ type: "info", label: `${payload.user_amount} ₽` }],
+                    transferTo: [{ type: "success", label: `${payload.user_balance} ₽` }],
+                    status: payload.user_name,
+                },
+            ]);
+
+            setName("");
+            setPhone("");
+            setAddingReferral(false);
+            setErrorMsg("");
+        } catch (err) {
+            if (err.response) {
+                console.error("Ошибка при добавлении реферала:", err.response.status, err.response.data);
+                setErrorMsg(`Ошибка ${err.response.status}: ${JSON.stringify(err.response.data)}`);
+            } else {
+                console.error("Ошибка сети:", err);
+                setErrorMsg("Ошибка сети. Попробуйте ещё раз");
+            }
+        }
+    };
 
     useEffect(() => {
+        const cached = Cookies.get("referralsData");
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed)) {
+                    setData(parsed);
+                    setLoading(false);
+                    console.log("Данные из cookie загружены", parsed);
+                    return;
+                }
+            } catch (e) {
+                console.error("Ошибка парсинга cookie:", e);
+            }
+        }
+
         getPartnerData()
             .then((res) => {
                 const referrals = res.data.referral_stats?.referral || [];
                 const statsByDate = res.data.referral_stats?.stats_by_date || {};
-
                 const dates = Object.keys(statsByDate);
 
                 const formatted = referrals.map((r, idx) => ({
@@ -207,10 +281,12 @@ function Referrals() {
                     amount: r.referral_id,
                     payoutRequest: [{ type: "info", label: `${r.total_amount} ₽` }],
                     transferTo: [{ type: "success", label: `${r.total_reward} ₽` }],
-                    status: r.name
+                    status: r.name,
                 }));
 
                 setData(formatted);
+                Cookies.set("referralsData", JSON.stringify(formatted), { expires: 1 });
+                console.log("Данные рефералов сохранены в cookie", formatted);
             })
             .catch((err) => {
                 console.error("Ошибка загрузки рефералов:", err);
@@ -253,17 +329,18 @@ function Referrals() {
         <TableContainer>
             <RefHeader style={{borderBottom: '1px solid #CBD5E1', paddingBottom: '24px'}}>
                 {addingReferral ? (
-                    <SearchWrapper style={{width: "100%"}}>
+                    <SearchWrapper style={{ width: "100%" }}>
                         <SecondVaribleHeader>
                             <h2>Добавление реферала</h2>
                         </SecondVaribleHeader>
 
-                        <div style={{display: "flex", gap: "8px", marginLeft: "auto", alignItems:'end'}}>
-                            <PhoneInput value={phone} onChange={setPhone} error={phoneError}/>
+                        <div style={{ display: "flex", gap: "8px", marginLeft: "auto", alignItems: "end" }}>
+                            <PhoneInput value={phone} onChange={setPhone} error={phoneError} />
 
-                            <div style={{display: "flex", flexDirection: "column", gap: "4px", minWidth: "200px"}}>
-                                <label style={{fontSize: "14px", fontWeight: "500", color: "#475569"}}>Укажите имя
-                                    клиента *</label>
+                            <div style={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: "200px" }}>
+                                <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>
+                                    Укажите имя клиента *
+                                </label>
                                 <input
                                     style={{
                                         height: "40px",
@@ -271,7 +348,7 @@ function Referrals() {
                                         border: "1px solid #CBD5E1",
                                         padding: "0 8px",
                                         fontSize: "14px",
-                                        width:260
+                                        width: 260,
                                     }}
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -280,9 +357,14 @@ function Referrals() {
                             </div>
 
                             <ButtonDefault
-                                style={{background: "#006999", height: 'max-content'}}
+                                style={{ background: "#006999", height: "max-content" }}
                                 ButtonTitle={"Добавить"}
-                            />
+                                onClick={addReferral}
+                            />{errorMsg && (
+                            <p style={{ color: "red", fontSize: "14px", marginTop: "8px" }}>
+                                {errorMsg}
+                            </p>
+                        )}
                         </div>
                     </SearchWrapper>
                 ) : (
@@ -321,7 +403,7 @@ function Referrals() {
                     </tr>
                 </TableHead>
                 <tbody>
-                {data.map((item, idx) => (
+                {pagedData.map((item, idx) => (
                     <Tr key={idx}>
                         <Td>{item.date}</Td>
                         <Td>{item.amount}</Td>

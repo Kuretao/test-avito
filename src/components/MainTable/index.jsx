@@ -4,6 +4,7 @@ import Table from "./Table";
 import TableNavigation from "./TableNavigation";
 import Input from "./../../ui/Input";
 import {getPartnerData} from "../../api/apiMetods.js";
+import Cookies from "js-cookie";
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -22,9 +23,28 @@ export default function Index() {
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     useEffect(() => {
+        const cached = Cookies.get("payoutsData");
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed)) {
+                    setData(parsed);
+                    setLoading(false);
+                    console.log("Данные из cookie загружены", parsed);
+                }
+            } catch (e) {
+                console.error("Ошибка парсинга куки:", e);
+            }
+        }
+
+        // 2. Обновляем с API
         getPartnerData()
             .then((res) => {
-                const payouts = res.data.partner_data.payouts || [];
+                const payouts = res?.data?.partner_data?.payouts || [];
+                if (!Array.isArray(payouts)) {
+                    console.warn("payouts не массив", payouts);
+                    return;
+                }
 
                 const formatted = payouts.map((p) => ({
                     date: p.dateTime,
@@ -32,14 +52,25 @@ export default function Index() {
                     payoutRequest: [
                         {
                             type: p.requestStatus === "закрыта" ? "success" : "info",
-                            label: p.request || "—"
-                        }
+                            label: p.request || "—",
+                        },
                     ],
                     transferTo: p.destination || "—",
-                    status: p.requestStatus || "—"
+                    status: p.requestStatus || "—",
                 }));
 
                 setData(formatted);
+                const simpleFormatted = formatted.map(({date, amount, transferTo, status, payoutRequest}) => ({
+                    date, amount, transferTo, status, payoutRequest: payoutRequest || []
+                }));
+
+
+                if (typeof window !== "undefined") {
+                    Cookies.set("payoutsData", JSON.stringify(simpleFormatted), { expires: 1 });
+                }
+
+                Cookies.set("payoutsData", JSON.stringify(formatted), { expires: 1 });
+                console.log("Данные сохранены в cookie", formatted);
             })
             .catch((err) => {
                 console.error("Ошибка при загрузке выплат:", err);
@@ -47,6 +78,7 @@ export default function Index() {
             })
             .finally(() => setLoading(false));
     }, []);
+
     const filteredData = data.filter(
         (item) =>
             item.date?.includes(searchTerm) ||

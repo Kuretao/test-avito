@@ -40,10 +40,13 @@ export default function TableRow({ row }) {
             <Td>{row.amount}</Td>
             <Td>
                 <PayoutContainer>
-                    {row.payoutRequest.map((item, idx) => (
-                        <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                    {(row.payoutRequest || []).map((item, idx) => (
+                        <OptionTable key={idx} type={item.type}>
+                            {item.label}
+                        </OptionTable>
                     ))}
                 </PayoutContainer>
+
             </Td>
             <Td>{row.transferTo}</Td>
             <Td>

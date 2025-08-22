@@ -2,6 +2,7 @@ import styled from "styled-components";
 import {RequisitesRow} from "./RequisiteRow.jsx";
 import {getPartnerData} from "../../api/apiMetods.js";
 import {useEffect, useState} from "react";
+import Cookies from "js-cookie";
 
 const RequisitesContainer = styled.section`
     display: flex;
@@ -50,8 +51,20 @@ function Requisites() {
     const [loading, setLoading] = useState(true);
     const [contactId, setContactId] = useState(null);
     useEffect(() => {
+        const cached = Cookies.get("organizationData");
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                setOrganizationData(parsed.data);
+                setContactId(parsed.contactId);
+                setLoading(false);
+            } catch (e) {
+                console.error("Ошибка парсинга куки:", e);
+            }
+        }
+
         getPartnerData()
-            .then(res => {
+            .then((res) => {
                 const partner = res.data.partner_data;
 
                 const formattedData = [
@@ -68,19 +81,19 @@ function Requisites() {
                     { title: "Расчетный счет", value: partner.RQ_ACC_NUM },
                     { title: "Есть презентация на платформе", value: true },
                     { title: "Прямая ссылка на регистрацию", value: true },
-                    {
-                        title: (
-                            <span>
-                          Реферальный промокод:{" "}
-                        </span>
-                        ),
-                        value: partner.contact_id
-                    },
+                    { title: "Реферальный промокод", value: partner.contact_id },
                 ];
+
                 setContactId(String(partner.contact_id));
                 setOrganizationData(formattedData);
+
+                Cookies.set(
+                    "organizationData",
+                    JSON.stringify({ data: formattedData, contactId: partner.contact_id }),
+                    { expires: 1 }
+                );
             })
-            .catch(err => console.error("Ошибка получения реквизитов:", err))
+            .catch((err) => console.error("Ошибка получения реквизитов:", err))
             .finally(() => setLoading(false));
     }, []);
 
@@ -103,7 +116,11 @@ function Requisites() {
                 <hr/>
                 <RequisitesColumn style={{marginLeft:32}}>
                     {secondColumnData.map(({ title, value }, index) => (
-                        <RequisitesRow key={index} title={title} value={value} contact_id={contactId} />
+                        <RequisitesRow key={index}   title={
+                            title === "Реферальный промокод" ? (
+                                <span>{title}: </span>
+                            ) : title
+                        } value={value} contact_id={contactId} />
                     ))}
                 </RequisitesColumn>
             </RequisitesContent>
