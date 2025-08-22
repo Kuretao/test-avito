@@ -303,7 +303,7 @@ export const RegistrationsChart = ({data}) => {
 }
 
 
-export const ChartsBlock = ({ chartData, filter, setFilter, setDateRange, children }) => {
+export const ChartsBlock = ({ chartData,dateRange, filter, setFilter, setDateRange, children }) => {
 
 
     return (
@@ -324,6 +324,7 @@ export const ChartsBlock = ({ chartData, filter, setFilter, setDateRange, childr
                     )
                 )}
                 <DateRangeInput
+                    value={dateRange}
                     onChange={({ start, end }) => {
                         setDateRange({ start, end });
                         setFilter("");
