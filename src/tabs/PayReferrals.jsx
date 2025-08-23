@@ -1,13 +1,13 @@
 import styled from "styled-components";
 import { ChartsBlock } from "./Register.jsx";
-import React, { useEffect, useMemo, useState } from "react";
-import OptionTable from "../ui/Option.jsx";
+import React, { useMemo, useState } from "react";import OptionTable from "../ui/Option.jsx";
 import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import QustionIcon from "../assets/icons/question-circle.svg";
 import { Question } from "../ui/Question.jsx";
 import Input from "../ui/Input.jsx";
 import peopleIcon from "../assets/icons/user-alt.svg";
 import { getPartnerData } from "../api/apiMetods.js";
+import {useData} from "../DataProvider/DataProvider.jsx";
 
 const Wrapper = styled.div`
     display: flex;
@@ -94,40 +94,33 @@ function prepareChartData(filtered) {
 }
 
 export const PayReferrals = () => {
+    const { data, loading, error } = useData();
+
     const [filter, setFilter] = useState("Всё время");
     const [dateRange, setDateRange] = useState({ start: "", end: "" });
     const [searchTerm, setSearchTerm] = useState("");
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [show, setShow] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [payToReferral, setPayToReferral] = useState([]);
-    const [registrations, setRegistrations] = useState([]);
 
-    useEffect(() => {
-        setLoading(true);
-        getPartnerData()
-            .then(({ data }) => {
-                setPayToReferral(data.payToReferral || []);
+    if (loading) return <p>Загрузка данных...</p>;
+    if (error) return <p>Ошибка загрузки данных: {error.message || error.toString()}</p>;
 
-                const registrationsMapped = (data.payToReferral || []).map((p) => {
-                    const [day, month, year] = p.date.split(".");
-                    return {
-                        date: `${year}-${month}-${day}`,
-                        count: 1,
-                        id_ref: p.id_ref,
-                        id_pay: p.id_pay,
-                        name_ref: p.name_ref,
-                        sum_pay: p.sum_pay,
-                        status: p.status,
-                        reward: p.reward,
-                    };
-                });
+    const rawData = data?.payToReferral || [];
 
-                setRegistrations(registrationsMapped);
-            })
-            .finally(() => setLoading(false));
-    }, []);
+    const registrations = rawData.map((p) => {
+        const [day, month, year] = p.date.split(".");
+        return {
+            date: `${year}-${month}-${day}`,
+            count: 1,
+            id_ref: p.id_ref,
+            id_pay: p.id_pay,
+            name_ref: p.name_ref,
+            sum_pay: p.sum_pay,
+            status: p.status,
+            reward: p.reward,
+        };
+    });
 
     const filtered = useMemo(() => {
         let result = [...registrations];
@@ -195,8 +188,6 @@ export const PayReferrals = () => {
     }, [filtered, page, itemsPerPage]);
 
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
-
-    if (loading) return <p>Загрузка данных...</p>;
 
     return (
         <Wrapper>

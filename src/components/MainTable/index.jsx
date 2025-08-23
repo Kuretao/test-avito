@@ -1,10 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, { useState} from "react";
 import styled from "styled-components";
 import Table from "./Table";
 import TableNavigation from "./TableNavigation";
 import Input from "./../../ui/Input";
-import {getPartnerData} from "../../api/apiMetods.js";
-import Cookies from "js-cookie";
+import {useData} from "../../DataProvider/DataProvider.jsx";
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -14,72 +13,34 @@ const TableContainer = styled.section`
 `
 
 export default function Index() {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { data, loading, error } = useData();
 
     const [searchTerm, setSearchTerm] = useState("");
     const [inputValue, setInputValue] = useState("");
     const [page, setPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
-    useEffect(() => {
-        const cached = Cookies.get("payoutsData");
-        if (cached) {
-            try {
-                const parsed = JSON.parse(cached);
-                if (Array.isArray(parsed)) {
-                    setData(parsed);
-                    setLoading(false);
-                    console.log("Данные из cookie загружены", parsed);
-                }
-            } catch (e) {
-                console.error("Ошибка парсинга куки:", e);
-            }
-        }
 
-        // 2. Обновляем с API
-        getPartnerData()
-            .then((res) => {
-                const payouts = res?.data?.partner_data?.payouts || [];
-                if (!Array.isArray(payouts)) {
-                    console.warn("payouts не массив", payouts);
-                    return;
-                }
+    if (loading) return <p>Загрузка выплат...</p>;
+    if (error) return <p>Ошибка загрузки данных: {error.message || error.toString()}</p>;
 
-                const formatted = payouts.map((p) => ({
-                    date: p.dateTime,
-                    amount: `${p.amount} ₽`,
-                    payoutRequest: [
-                        {
-                            type: p.requestStatus === "закрыта" ? "success" : "info",
-                            label: p.request || "—",
-                        },
-                    ],
-                    transferTo: p.destination || "—",
-                    status: p.requestStatus || "—",
-                }));
+    if (!data?.partner_data?.payouts) return <p>Нет данных о выплатах</p>;
 
-                setData(formatted);
-                const simpleFormatted = formatted.map(({date, amount, transferTo, status, payoutRequest}) => ({
-                    date, amount, transferTo, status, payoutRequest: payoutRequest || []
-                }));
+    const payouts = data.partner_data.payouts;
 
+    const formatted = payouts.map((p) => ({
+        date: p.dateTime,
+        amount: `${p.amount} ₽`,
+        payoutRequest: [
+            {
+                type: p.requestStatus === "закрыта" ? "success" : "info",
+                label: p.request || "—",
+            },
+        ],
+        transferTo: p.destination || "—",
+        status: p.requestStatus || "—",
+    }));
 
-                if (typeof window !== "undefined") {
-                    Cookies.set("payoutsData", JSON.stringify(simpleFormatted), { expires: 1 });
-                }
-
-                Cookies.set("payoutsData", JSON.stringify(formatted), { expires: 1 });
-                console.log("Данные сохранены в cookie", formatted);
-            })
-            .catch((err) => {
-                console.error("Ошибка при загрузке выплат:", err);
-                setError("Не удалось загрузить данные");
-            })
-            .finally(() => setLoading(false));
-    }, []);
-
-    const filteredData = data.filter(
+    const filteredData = formatted.filter(
         (item) =>
             item.date?.includes(searchTerm) ||
             item.amount?.includes(searchTerm) ||
@@ -93,9 +54,6 @@ export default function Index() {
         setPage(1);
         setSearchTerm(inputValue);
     };
-
-    if (loading) return <p>Загрузка выплат...</p>;
-    if (error) return <p>{error}</p>;
     return (
         <TableContainer>
             <Input

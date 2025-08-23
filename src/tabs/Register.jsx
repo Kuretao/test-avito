@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import copyIcon from "../assets/icons/copy.svg";
 import {DateRangeInput} from "../ui/Date.jsx";
+import {useData} from "../DataProvider/DataProvider.jsx";
 
 
 const Wrapper = styled.div`
@@ -218,14 +219,47 @@ const RegItem = styled.li`
 `;
 
 
-const registrationsAll = [
-    {date: '2024-04-17', count: 6},
-    {date: '2024-04-18', count: 12},
-    {date: '2024-04-29', count: 14},
-    {date: '2024-04-30', count: 15},
-    {date: '2024-05-03', count: 22},
-    {date: '2024-05-08', count: 11},
-];
+// с бэка приходят данные вот так
+
+// {,…}
+// partner_data
+//     :
+// {NAME: "ИП", RQ_ACC_NUM: "40802810900008456717", RQ_BANK_NAME: "АО "ТБанк"", RQ_BIK: "044525974",…}
+// payToReferral
+//     :
+//     [{date: "05.06.2023", id_pay: 116165, id_ref: 21093, name_ref: "Евгений", reward: "1200.00",…},…]
+// referral_stats
+//     :
+// {referral: [{name: "Евгений", referral_id: "21093", total_amount: 4500, total_reward: 1800},…],…}
+// referral
+//     :
+//     [{name: "Евгений", referral_id: "21093", total_amount: 4500, total_reward: 1800},…]
+// stats_by_date
+//     :
+// {2023-08-14: 2, 2023-08-16: 1, 2023-08-22: 1, 2023-09-05: 1, 2023-09-09: 1, 2023-10-09: 2,…}
+// 2023-08-14
+// :
+// 2
+// 2023-08-16
+// :
+// 1
+// 2023-08-22
+// :
+// 1
+// 2023-09-05
+// :
+// 1
+// 2023-09-09
+// :
+// 1
+// 2023-10-09
+// :
+// 2
+// 2023-10-22
+// :
+// 1
+
+// нам нужно это stats_by_date
 
 
 
@@ -339,8 +373,19 @@ export const ChartsBlock = ({ chartData,dateRange, filter, setFilter, setDateRan
 
 
 const ReferralComponent = () => {
+    const { data, loading, error } = useData();
     const [filter, setFilter] = useState("Всё время");
     const [dateRange, setDateRange] = useState({ start: "", end: "" });
+
+    if (loading) return <p>Загрузка данных...</p>;
+    if (error) return <p>Ошибка загрузки данных: {error.message || error.toString()}</p>;
+
+    const registrationsAll = useMemo(() => {
+        const stats = data?.referral_stats?.stats_by_date || {};
+        return Object.entries(stats)
+            .map(([date, count]) => ({ date, count }))
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+    }, [data]);
 
     const filtered = useMemo(() => {
         let result = registrationsAll;
@@ -360,37 +405,36 @@ const ReferralComponent = () => {
                 return registrationsAll.filter(
                     (r) => r.date === today.toISOString().slice(0, 10)
                 );
-            case "Вчера":
+            case "Вчера": {
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
                 return registrationsAll.filter(
                     (r) => r.date === yesterday.toISOString().slice(0, 10)
                 );
-            case "Неделя":
+            }
+            case "Неделя": {
                 const weekAgo = new Date(today);
                 weekAgo.setDate(today.getDate() - 7);
-                return registrationsAll.filter(
-                    (r) => new Date(r.date) >= weekAgo
-                );
-            case "Месяц":
+                return registrationsAll.filter((r) => new Date(r.date) >= weekAgo);
+            }
+            case "Месяц": {
                 const monthAgo = new Date(today);
                 monthAgo.setMonth(today.getMonth() - 1);
-                return registrationsAll.filter(
-                    (r) => new Date(r.date) >= monthAgo
-                );
-            case "Год":
+                return registrationsAll.filter((r) => new Date(r.date) >= monthAgo);
+            }
+            case "Год": {
                 const yearAgo = new Date(today);
                 yearAgo.setFullYear(today.getFullYear() - 1);
-                return registrationsAll.filter(
-                    (r) => new Date(r.date) >= yearAgo
-                );
+                return registrationsAll.filter((r) => new Date(r.date) >= yearAgo);
+            }
             case "Всё время":
             default:
                 return registrationsAll;
         }
-    }, [filter, dateRange]);
+    }, [filter, dateRange, registrationsAll]);
 
     const chartData = useMemo(() => prepareChartData(filtered), [filtered]);
+
     const totalRegistrations = chartData.reduce(
         (sum, item) => sum + item.registrations,
         0

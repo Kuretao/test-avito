@@ -5,9 +5,8 @@ import TableNavigation from "../components/MainTable/TableNavigation.jsx";
 import {ButtonDefault} from "../ui/Button.jsx";
 import OptionTable from "../ui/Option.jsx";
 import searchIcon from "../assets/icons/search.svg";
-import {getPartnerData} from "../api/apiMetods.js";
 import api from "../api/apiAxios.js";
-import Cookies from "js-cookie";
+import {useData} from "../DataProvider/DataProvider.jsx";
 
 const TableContainer = styled.section`
     padding: 20px;
@@ -175,6 +174,8 @@ const SecondVaribleHeader = styled.div`
 
 
 function Referrals() {
+    const { data, loading, error } = useData();
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState("");
     const [inputValue, setInputValue] = useState("");
     const [page, setPage] = useState(1);
@@ -183,9 +184,10 @@ function Referrals() {
     const containerRef = useRef(null);
     const [phone, setPhone] = useState("");
     const [phoneError, setPhoneError] = useState("");
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [errorMsg, setErrorMsg] = useState("");
+    const [name, setName] = useState("");
+    const [addingReferral, setAddingReferral] = useState(false);
+    const [addingLoading, setAddingLoading] = useState(false);
 
     useEffect(() => {
         if (phone.trim() === "") {
@@ -195,7 +197,48 @@ function Referrals() {
         }
     }, [phone]);
 
-    const [errorMsg, setErrorMsg] = useState("");
+    useEffect (() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setExpanded(false);
+                setSearchShow(true);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    if (loading) return <p>Загрузка рефералов...</p>;
+    if (error) return <p>Ошибка загрузки данных: {error.message || error.toString()}</p>;
+
+    const referrals = data?.referral_stats?.referral || [];
+    const statsByDate = data?.referral_stats?.stats_by_date || {};
+    const dates = Object.keys(statsByDate);
+
+    const formatted = referrals.map((r, idx) => ({
+        date: dates[idx] || "-",
+        amount: r.referral_id,
+        payoutRequest: [{ type: "info", label: `${r.total_amount} ₽` }],
+        transferTo: [{ type: "success", label: `${r.total_reward} ₽` }],
+        status: r.name,
+    }));
+
+    const filteredData = formatted.filter(
+        (item) =>
+            item.date?.includes(searchTerm) ||
+            item.amount?.toString().includes(searchTerm) ||
+            item.status?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const pagedData = filteredData.slice(
+        (page - 1) * itemsPerPage,
+        page * itemsPerPage
+    );
+
+    const onSearch = () => {
+        setPage(1);
+        setSearchTerm(inputValue);
+    };
 
     const addReferral = async () => {
         if (!name.trim() || !phone.trim()) {
@@ -203,9 +246,7 @@ function Referrals() {
             return;
         }
 
-        const normalizePhone = (phone) => {
-            return phone.replace(/[^\d+]/g, "");
-        };
+        const normalizePhone = (phone) => phone.replace(/[^\d+]/g, "");
 
         const payload = {
             user_id: 16511,
@@ -219,30 +260,28 @@ function Referrals() {
             exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24,
         };
 
-
-        console.log("Отправляем payload:", payload);
-
+        setAddingLoading(true);
         try {
             const res = await api.post("/add_ref", payload, {
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json" },
             });
             console.log("Реферал добавлен:", res.data);
 
-            setData((prev) => [
-                ...prev,
-                {
-                    date: new Date().toLocaleString(),
-                    amount: payload.user_id,
-                    payoutRequest: [{ type: "info", label: `${payload.user_amount} ₽` }],
-                    transferTo: [{ type: "success", label: `${payload.user_balance} ₽` }],
-                    status: payload.user_name,
-                },
-            ]);
+            formatted.unshift({
+                date: new Date().toLocaleString(),
+                amount: payload.user_id,
+                payoutRequest: [{ type: "info", label: `${payload.user_amount} ₽` }],
+                transferTo: [{ type: "success", label: `${payload.user_balance} ₽` }],
+                status: payload.user_name,
+            });
 
-            setName("");
-            setPhone("");
+            setSearchTerm("");
+            setInputValue("");
+            setPage(1);
             setAddingReferral(false);
             setErrorMsg("");
+            setName("");
+            setPhone("");
         } catch (err) {
             if (err.response) {
                 console.error("Ошибка при добавлении реферала:", err.response.status, err.response.data);
@@ -251,79 +290,10 @@ function Referrals() {
                 console.error("Ошибка сети:", err);
                 setErrorMsg("Ошибка сети. Попробуйте ещё раз");
             }
+        } finally {
+            setAddingLoading(false);
         }
     };
-
-    useEffect(() => {
-        const cached = Cookies.get("referralsData");
-        if (cached) {
-            try {
-                const parsed = JSON.parse(cached);
-                if (Array.isArray(parsed)) {
-                    setData(parsed);
-                    setLoading(false);
-                    console.log("Данные из cookie загружены", parsed);
-                    return;
-                }
-            } catch (e) {
-                console.error("Ошибка парсинга cookie:", e);
-            }
-        }
-
-        getPartnerData()
-            .then((res) => {
-                const referrals = res.data.referral_stats?.referral || [];
-                const statsByDate = res.data.referral_stats?.stats_by_date || {};
-                const dates = Object.keys(statsByDate);
-
-                const formatted = referrals.map((r, idx) => ({
-                    date: dates[idx] || "-",
-                    amount: r.referral_id,
-                    payoutRequest: [{ type: "info", label: `${r.total_amount} ₽` }],
-                    transferTo: [{ type: "success", label: `${r.total_reward} ₽` }],
-                    status: r.name,
-                }));
-
-                setData(formatted);
-                Cookies.set("referralsData", JSON.stringify(formatted), { expires: 1 });
-                console.log("Данные рефералов сохранены в cookie", formatted);
-            })
-            .catch((err) => {
-                console.error("Ошибка загрузки рефералов:", err);
-                setError("Не удалось загрузить данные рефералов");
-            })
-            .finally(() => setLoading(false));
-    }, []);
-
-
-
-    const [name, setName] = useState("");
-    const [addingReferral, setAddingReferral] = useState(false);
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (containerRef.current && !containerRef.current.contains(event.target)) {
-                setExpanded(false);
-                setSearchShow(true);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
-    const filteredData = data.filter(
-        (item) =>
-            item.date?.includes(searchTerm) ||
-            item.amount?.toString().includes(searchTerm) ||
-            item.status?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-    const pagedData = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-    const onSearch = () => {
-        setPage(1);
-        setSearchTerm(inputValue);
-    };
-    if (loading) return <p>Загрузка рефералов...</p>;
-    if (error) return <p>{error}</p>;
 
     return (
         <TableContainer>
@@ -434,9 +404,8 @@ function Referrals() {
                 setPage={setPage}
                 totalPages={totalPages}
                 totalRecords={filteredData.length}
-                itemsPerPage={itemsPerPage}
-                setItemsPerPage={setItemsPerPage}
-            />
+                itemsPerPage={5}
+                setItemsPerPage={setItemsPerPage}            />
         </TableContainer>
     )
 }

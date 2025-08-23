@@ -1,8 +1,6 @@
 import styled from "styled-components";
 import {RequisitesRow} from "./RequisiteRow.jsx";
-import {getPartnerData} from "../../api/apiMetods.js";
-import {useEffect, useState} from "react";
-import Cookies from "js-cookie";
+import {useData} from "../../DataProvider/DataProvider.jsx";
 
 const RequisitesContainer = styled.section`
     display: flex;
@@ -47,60 +45,38 @@ const RequisitesColumn = styled.div`
 `
 
 function Requisites() {
-    const [organizationData, setOrganizationData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [contactId, setContactId] = useState(null);
-    useEffect(() => {
-        const cached = Cookies.get("organizationData");
-        if (cached) {
-            try {
-                const parsed = JSON.parse(cached);
-                setOrganizationData(parsed.data);
-                setContactId(parsed.contactId);
-                setLoading(false);
-            } catch (e) {
-                console.error("Ошибка парсинга куки:", e);
-            }
-        }
-
-        getPartnerData()
-            .then((res) => {
-                const partner = res.data.partner_data;
-
-                const formattedData = [
-                    { title: "Название организации", value: partner.NAME },
-                    { title: "ФИО", value: partner.RQ_NAME },
-                    { title: "Юридический статус", value: partner.NAME },
-                    { title: "ИНН", value: partner.RQ_INN },
-                    { title: "Email", value: partner.email },
-                    { title: "Телефон", value: partner.phone },
-                    { title: "Система налогообложения", value: partner.UF_CRM_1754332172 },
-                    { title: "БИК", value: partner.RQ_BIK },
-                    { title: "Название банка", value: partner.RQ_BANK_NAME },
-                    { title: "Корреспондентский счет", value: partner.RQ_COR_ACC_NUM },
-                    { title: "Расчетный счет", value: partner.RQ_ACC_NUM },
-                    { title: "Есть презентация на платформе", value: true },
-                    { title: "Прямая ссылка на регистрацию", value: true },
-                    { title: "Реферальный промокод", value: partner.contact_id },
-                ];
-
-                setContactId(String(partner.contact_id));
-                setOrganizationData(formattedData);
-
-                Cookies.set(
-                    "organizationData",
-                    JSON.stringify({ data: formattedData, contactId: partner.contact_id }),
-                    { expires: 1 }
-                );
-            })
-            .catch((err) => console.error("Ошибка получения реквизитов:", err))
-            .finally(() => setLoading(false));
-    }, []);
+    const { data, loading, error } = useData();
 
     if (loading) return <p>Загрузка реквизитов...</p>;
+    if (error) return <p>Ошибка загрузки данных: {error.message || error.toString()}</p>;
 
-    const firstColumnData = organizationData.slice(0, organizationData.length - 3);
-    const secondColumnData = organizationData.slice(-3);
+    if (!data || !data.partner_data) return <p>Нет данных партнера</p>;
+
+    const partner = data.partner_data;
+
+
+    const formattedData = [
+        { title: "Название организации", value: partner.NAME },
+        { title: "ФИО", value: partner.RQ_NAME },
+        { title: "Юридический статус", value: partner.NAME },
+        { title: "ИНН", value: partner.RQ_INN },
+        { title: "Email", value: partner.email },
+        { title: "Телефон", value: partner.phone },
+        { title: "Система налогообложения", value: partner.UF_CRM_1754332172 },
+        { title: "БИК", value: partner.RQ_BIK },
+        { title: "Название банка", value: partner.RQ_BANK_NAME },
+        { title: "Корреспондентский счет", value: partner.RQ_COR_ACC_NUM },
+        { title: "Расчетный счет", value: partner.RQ_ACC_NUM },
+        { title: "Есть презентация на платформе", value: true },
+        { title: "Прямая ссылка на регистрацию", value: true },
+        { title: "Реферальный промокод", value: partner.contact_id },
+    ];
+
+
+    const firstColumnData = formattedData.slice(0, formattedData.length - 3);
+    const secondColumnData = formattedData.slice(-3);
+
+    const contactId = String(partner.contact_id);
 
 
     return (

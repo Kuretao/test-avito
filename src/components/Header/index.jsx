@@ -2,15 +2,8 @@ import styled from "styled-components";
 import { HeaderDataItem } from "./HeaderData.jsx";
 import { ButtonDefault } from "../../ui/Button.jsx";
 import { useState } from "react";
-import axios from "axios";
-
-const Data = [
-    { id: 1, title: 'Баланс на счете', question: true, value: '200 руб.' },
-    { id: 2, title: 'Группа 1', question: false, value: <>40 %</> },
-    { id: 3, title: 'Группа 2', question: false, value: <>40 %</> },
-    { id: 4, title: 'Группа 3', question: false, value: <>40 %</> },
-    { id: 5, title: 'Группа 4', question: false, value: <>40 %</> },
-];
+import api from "../../api/apiAxios.js";
+import {useData} from "../../DataProvider/DataProvider.jsx";
 
 const Header = styled.header`
     display: flex;
@@ -90,23 +83,43 @@ const HeaderCheckboxLabel = styled.label`
     line-height: 120%;
     color: #475569;
     cursor: pointer;
-    white-space: nowrap; 
+    white-space: nowrap;
 
     a {
         color: #006999;
-        display: inline; 
-        white-space: pre-line; 
+        display: inline;
+        white-space: pre-line;
     }
 `;
 
-
 function IndexHeader() {
+    const { data, loading, error } = useData();
+
     const [show, setShow] = useState(false);
     const [checked, setChecked] = useState(false);
 
+    if (loading) return <p>Загрузка данных...</p>;
+    if (error) return <p>Ошибка загрузки данных</p>;
+
+    const partner = data?.partner_data || {};
+
+
+    const dynamicData = [
+        {
+            id: 1,
+            title: 'Баланс на счете',
+            question: true,
+            value: `${partner.current_balance ?? 0} руб.`,
+        },
+        { id: 2, title: 'Группа 1', question: false, value: <>40 %</> },
+        { id: 3, title: 'Группа 2', question: false, value: <>40 %</> },
+        { id: 4, title: 'Группа 3', question: false, value: <>40 %</> },
+        { id: 5, title: 'Группа 4', question: false, value: <>40 %</> },
+    ];
+
     const handleApiRequest = async () => {
         try {
-            const response = await axios.post("/api/withdraw", { someData: true });
+            const response = await api.post("/api/withdraw", { user_id: partner.contact_id });
             console.log("Успех:", response.data);
         } catch (error) {
             console.error("Ошибка запроса:", error);
@@ -119,10 +132,12 @@ function IndexHeader() {
         }
     };
 
+    const isButtonActive = partner.button_active && partner.agreement_accepted;
+
     return (
         <Header>
             <HeaderContent>
-                {Data.map((item) => (
+                {dynamicData.map((item) => (
                     <HeaderDataItem
                         key={item.id}
                         index={item.id}
@@ -144,11 +159,16 @@ function IndexHeader() {
                         />
                         <CustomCheckbox />
                         <span>
-                            Ознакомлен с <a href="https://b2b-help.ru/individual_partnership_agreement/" target="_blank" rel="noreferrer">
-                        индивидуальным <br/> партнёрским соглашением</a>
+                            Ознакомлен с{" "}
+                            <a
+                                href="https://b2b-help.ru/individual_partnership_agreement/"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                индивидуальным <br /> партнёрским соглашением
+                            </a>
                         </span>
                     </HeaderCheckboxLabel>
-
                 )}
 
                 <ButtonDefault
@@ -160,7 +180,7 @@ function IndexHeader() {
                             handleContinueClick();
                         }
                     }}
-                    disabled={show && !checked}
+                    disabled={show && (!checked || !isButtonActive)}
                 />
             </HeaderLeftSide>
         </Header>
