@@ -4,6 +4,7 @@ import searchIcon from "./../assets/icons/search.svg";
 import pdfIcon from "./../assets/icons/pdf.svg";
 import downloadIcon from "./../assets/icons/download.svg";
 import Input from "../ui/Input.jsx";
+import {getActs} from "../api/apiMetods.js";
 
 const ActsContainer = styled.section`
     display: flex;
@@ -182,17 +183,36 @@ const Empty = styled.div`
     height: 40px;
 `
 
-const actsData = Array(10).fill({
-    description: "Акт выполненных работ № Л103 от 17.06.2025 г.",
-    date: "24.07.2025",
-    downloadUrl: "https://example.com/file.pdf",
-});
 
 export const Acts = () => {
+    const [acts, setActs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const [sortDirection, setSortDirection] = useState("desc");
     const [searchShow, setSearchShow] = useState(true);
     const [expanded, setExpanded] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
     const containerRef = useRef(null);
+
+    useEffect(() => {
+        getActs()
+            .then(res => {
+                const actsArray = res.data.acts || [];
+                const formatted = actsArray.map(act => ({
+                    description: act.title,
+                    date: new Date(act.createdDate).toLocaleDateString("ru-RU"),
+                    rawDate: act.createdDate,
+                    downloadUrl: act.downloadLink
+                }));
+                setActs(formatted);
+            })
+            .catch(err => {
+                console.error("Ошибка загрузки актов:", err);
+                setError("Не удалось загрузить акты");
+            })
+            .finally(() => setLoading(false));
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -209,13 +229,22 @@ export const Acts = () => {
         setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     };
 
-    const sortedActs = useMemo(() => {
-        return actsData.sort((a, b) => {
-            const dateA = new Date(a.date.split(".").reverse().join("-"));
-            const dateB = new Date(b.date.split(".").reverse().join("-"));
-            return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
-        });
-    }, [sortDirection]);
+    const filteredAndSortedActs = useMemo(() => {
+        return acts
+            .filter(act =>
+                act.description.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .slice()
+            .sort((a, b) => {
+                const dateA = new Date(a.rawDate);
+                const dateB = new Date(b.rawDate);
+                return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+            });
+    }, [acts, sortDirection, searchQuery]);
+
+
+    if (loading) return <p>Загрузка актов...</p>;
+    if (error) return <p>{error}</p>;
 
     return (
         <ActsContainer>
@@ -231,7 +260,7 @@ export const Acts = () => {
                                     onClick={() => setExpanded((prev) => !prev)}
                                 />
                             }
-                            <AnimatedInput $expanded={expanded} placeholder="Поиск" />
+                            <AnimatedInput $expanded={expanded} placeholder="Поиск" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
                         </SearchButton>
                     </SearchWrapper>
                     <SortButton onClick={toggleSort}>
@@ -242,7 +271,7 @@ export const Acts = () => {
                 </TopBar>
 
                 <List>
-                    {sortedActs.map((act, idx) => (
+                    {filteredAndSortedActs.map((act, idx) => (
                         <ListItem key={idx} $odd={idx % 2 !== 0}>
                             <Column>
                                 <img src={pdfIcon} alt="PDF" style={{width: 28}}/>
