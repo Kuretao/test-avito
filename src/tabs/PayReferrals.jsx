@@ -81,16 +81,10 @@ const DateWrapper = styled.span`
 `;
 
 function prepareChartData(filtered) {
-    if (filtered.length === 0) return [];
-    const datesMap = new Map(filtered.map(({ date, count }) => [date, count]));
-    const start = new Date(filtered[0].date);
-    const end = new Date(filtered[filtered.length - 1].date);
-    const allDates = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const iso = d.toISOString().slice(0, 10);
-        allDates.push({ date: iso, registrations: datesMap.get(iso) || 0 });
-    }
-    return allDates;
+    return filtered.map(({ date, count }) => ({
+        date,
+        registrations: Number(count),
+    }));
 }
 
 export const PayReferrals = () => {
@@ -121,7 +115,10 @@ export const PayReferrals = () => {
             reward: p.reward,
         };
     });
-
+    function formatNumber(num) {
+        if (num == null || isNaN(num)) return "";
+        return new Intl.NumberFormat("ru-RU").format(num);
+    }
     const filtered = useMemo(() => {
         let result = [...registrations];
         const today = new Date();
@@ -245,19 +242,21 @@ export const PayReferrals = () => {
                             <Td>
                                 <PayoutContainer>
                                     <OptionTable
-                                        style={{background: "#CCEFFF", color: "#006999"}}>{item.sum_pay} ₽</OptionTable>
+                                        style={{background: "#CCEFFF", color: "#006999"}}>{formatNumber(item.sum_pay)} ₽</OptionTable>
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer>
                                     <OptionTable
-                                        style={{background: "#FFE396", color: "#475569"}}>{item.status}</OptionTable>
+                                        style={{
+                                            backgroundColor: item.status === 'Начислено' ? '#C8E49D' : '#FFE396',
+                                            color: "#475569"}}>{item.status}</OptionTable>
                                 </PayoutContainer>
                             </Td>
                             <Td>
                                 <PayoutContainer>
                                     <OptionTable
-                                        style={{background: "#FFE396", color: "#475569"}}>{item.reward} ₽</OptionTable>
+                                        style={{backgroundColor: item.status === 'Начислено' ? '#C8E49D' : '#FFE396', color: "#475569"}}>{formatNumber(item.reward)} ₽</OptionTable>
                                 </PayoutContainer>
                             </Td>
                         </Tr>

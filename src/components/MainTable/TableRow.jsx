@@ -34,10 +34,18 @@ const PayoutContainer = styled.div`
 `;
 
 export default function TableRow({ row }) {
+    function formatNumber(value) {
+        if (value == null) return "";
+
+        const num = Number(String(value).replace(/[^\d.-]/g, ""));
+        if (isNaN(num)) return value;
+
+        return new Intl.NumberFormat("ru-RU").format(num);
+    }
     return (
         <Tr>
             <Td>{row.date}</Td>
-            <Td>{row.amount}</Td>
+            <Td>{formatNumber(row.amount)} ₽</Td>
             <Td>
                 <PayoutContainer>
                     {(row.payoutRequest || []).map((item, idx) => (
@@ -50,7 +58,7 @@ export default function TableRow({ row }) {
             </Td>
             <Td>{row.transferTo}</Td>
             <Td>
-                <OptionTable type="success">{row.status}</OptionTable>
+                <OptionTable type="success"  style={{backgroundColor: row.status === 'открыта' ? '#E2E8F0' : '#C8E49D'}} >{row.status}</OptionTable>
             </Td>
         </Tr>
     );

@@ -218,8 +218,8 @@ function Referrals() {
     const formatted = referrals.map((r, idx) => ({
         date: dates[idx] || "-",
         amount: r.referral_id,
-        payoutRequest: [{ type: "info", label: `${r.total_amount} ₽` }],
-        transferTo: [{ type: "success", label: `${r.total_reward} ₽` }],
+        payoutRequest: [{ type: "info", label: r.total_amount }],
+        transferTo: [{ type: "success", label: r.total_reward }],
         status: r.name,
     }));
 
@@ -294,6 +294,11 @@ function Referrals() {
             setAddingLoading(false);
         }
     };
+
+    function formatNumber(num) {
+        if (num == null || isNaN(num)) return "";
+        return new Intl.NumberFormat("ru-RU").format(num);
+    }
 
     return (
         <TableContainer>
@@ -381,18 +386,22 @@ function Referrals() {
                             <PayoutContainer>
                                 {item.payoutRequest.map((item, idx) => (
                                     <OptionTable style={{background: "#CCEFFF", color: "#006999"}} key={idx}
-                                                 type={item.type}>{item.label}</OptionTable>
+                                                 type={item.type}>{formatNumber(item.label)} ₽</OptionTable>
                                 ))}
                             </PayoutContainer>
                         </Td>
                         <Td>
                             <PayoutContainer>
                                 {item.transferTo.map((item, idx) => (
-                                    <OptionTable key={idx} type={item.type}>{item.label}</OptionTable>
+                                    <OptionTable key={idx} type={item.type}>{formatNumber(item.label)} ₽</OptionTable>
                                 ))}
                             </PayoutContainer>
                         </Td>
-                        <Td style={{maxWidth: '266px'}}>
+                        <Td
+                            style={{
+                                maxWidth: '266px',
+                            }}
+                        >
                             {item.status}
                         </Td>
                     </Tr>

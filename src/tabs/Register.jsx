@@ -162,7 +162,6 @@ const ChartBlock = styled.div`
     gap: 16px;
     background-color: #fff;
 `
-const Chart = styled.div` /* ... */ `;
 const RegBlock = styled.div`
     display: flex;
     flex-direction: column;
@@ -218,65 +217,11 @@ const RegItem = styled.li`
     }
 `;
 
-
-// с бэка приходят данные вот так
-
-// {,…}
-// partner_data
-//     :
-// {NAME: "ИП", RQ_ACC_NUM: "40802810900008456717", RQ_BANK_NAME: "АО "ТБанк"", RQ_BIK: "044525974",…}
-// payToReferral
-//     :
-//     [{date: "05.06.2023", id_pay: 116165, id_ref: 21093, name_ref: "Евгений", reward: "1200.00",…},…]
-// referral_stats
-//     :
-// {referral: [{name: "Евгений", referral_id: "21093", total_amount: 4500, total_reward: 1800},…],…}
-// referral
-//     :
-//     [{name: "Евгений", referral_id: "21093", total_amount: 4500, total_reward: 1800},…]
-// stats_by_date
-//     :
-// {2023-08-14: 2, 2023-08-16: 1, 2023-08-22: 1, 2023-09-05: 1, 2023-09-09: 1, 2023-10-09: 2,…}
-// 2023-08-14
-// :
-// 2
-// 2023-08-16
-// :
-// 1
-// 2023-08-22
-// :
-// 1
-// 2023-09-05
-// :
-// 1
-// 2023-09-09
-// :
-// 1
-// 2023-10-09
-// :
-// 2
-// 2023-10-22
-// :
-// 1
-
-// нам нужно это stats_by_date
-
-
-
 function prepareChartData(filtered) {
-    if (filtered.length === 0) return [];
-    const datesMap = new Map(filtered.map(({ date, count }) => [date, count]));
-    const start = new Date(filtered[0].date);
-    const end = new Date(filtered[filtered.length - 1].date);
-    const allDates = [];
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const iso = d.toISOString().slice(0, 10);
-        allDates.push({
-            date: iso,
-            registrations: Number(datesMap.get(iso) || 0),
-        });
-    }
-    return allDates;
+    return filtered.map(({ date, count }) => ({
+        date,
+        registrations: Number(count),
+    }));
 }
 
 
@@ -496,11 +441,13 @@ const ReferralComponent = () => {
             <RegBlock>
                 <RegTitle>Количество регистраций: {totalRegistrations}</RegTitle>
                 <RegList>
-                    {chartData.map(item => (
-                        <RegItem key={item.date}>
-                            <span>{item.date}</span> – {item.registrations} человек(а)
-                        </RegItem>
-                    ))}
+                    {chartData
+                        .filter(item => item.registrations > 0)
+                        .map(item => (
+                            <RegItem key={item.date}>
+                                <span>{item.date}</span> – {item.registrations} человек(а)
+                            </RegItem>
+                        ))}
                 </RegList>
             </RegBlock>
         </Wrapper>
