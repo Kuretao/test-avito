@@ -333,50 +333,57 @@ const ReferralComponent = () => {
     }, [data]);
 
     const filtered = useMemo(() => {
-        let result = registrationsAll;
+        let result = [...registrationsAll];
         const today = new Date();
 
         if (dateRange.start && dateRange.end) {
             const start = new Date(dateRange.start);
             const end = new Date(dateRange.end);
-            return result.filter((r) => {
+            result = result.filter((r) => {
                 const current = new Date(r.date);
                 return current >= start && current <= end;
             });
+        } else {
+            switch (filter) {
+                case "Сегодня":
+                    result = result.filter(r => r.date === today.toISOString().slice(0,10));
+                    break;
+                case "Вчера": {
+                    const yesterday = new Date(today);
+                    yesterday.setDate(today.getDate() - 1);
+                    result = result.filter(r => r.date === yesterday.toISOString().slice(0,10));
+                    break;
+                }
+                case "Неделя": {
+                    const weekAgo = new Date(today);
+                    weekAgo.setDate(today.getDate() - 7);
+                    result = result.filter(r => new Date(r.date) >= weekAgo);
+                    break;
+                }
+                case "Месяц": {
+                    const monthAgo = new Date(today);
+                    monthAgo.setMonth(today.getMonth() - 1);
+                    result = result.filter(r => new Date(r.date) >= monthAgo);
+                    break;
+                }
+                case "Год": {
+                    const yearAgo = new Date(today);
+                    yearAgo.setFullYear(today.getFullYear() - 1);
+                    result = result.filter(r => new Date(r.date) >= yearAgo);
+                    break;
+                }
+                case "Всё время":
+                default:
+                    break;
+            }
         }
 
-        switch (filter) {
-            case "Сегодня":
-                return registrationsAll.filter(
-                    (r) => r.date === today.toISOString().slice(0, 10)
-                );
-            case "Вчера": {
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-                return registrationsAll.filter(
-                    (r) => r.date === yesterday.toISOString().slice(0, 10)
-                );
-            }
-            case "Неделя": {
-                const weekAgo = new Date(today);
-                weekAgo.setDate(today.getDate() - 7);
-                return registrationsAll.filter((r) => new Date(r.date) >= weekAgo);
-            }
-            case "Месяц": {
-                const monthAgo = new Date(today);
-                monthAgo.setMonth(today.getMonth() - 1);
-                return registrationsAll.filter((r) => new Date(r.date) >= monthAgo);
-            }
-            case "Год": {
-                const yearAgo = new Date(today);
-                yearAgo.setFullYear(today.getFullYear() - 1);
-                return registrationsAll.filter((r) => new Date(r.date) >= yearAgo);
-            }
-            case "Всё время":
-            default:
-                return registrationsAll;
-        }
+
+        result.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        return result;
     }, [filter, dateRange, registrationsAll]);
+
 
     const chartData = useMemo(() => prepareChartData(filtered), [filtered]);
 

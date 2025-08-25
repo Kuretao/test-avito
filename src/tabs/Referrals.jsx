@@ -221,8 +221,8 @@ function Referrals() {
         payoutRequest: [{ type: "info", label: r.total_amount }],
         transferTo: [{ type: "success", label: r.total_reward }],
         status: r.name,
-    }));
-
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
     const filteredData = formatted.filter(
         (item) =>
             item.date?.includes(searchTerm) ||

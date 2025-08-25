@@ -172,7 +172,7 @@ export const PayReferrals = () => {
                 }
             }
         }
-
+        result.sort((a, b) => new Date(b.date) - new Date(a.date));
         return result;
     }, [filter, dateRange, registrations, searchTerm]);
 

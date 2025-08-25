@@ -38,7 +38,7 @@ export default function Index() {
         ],
         transferTo: p.destination || "—",
         status: p.requestStatus || "—",
-    }));
+    })).sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const filteredData = formatted.filter(
         (item) =>
