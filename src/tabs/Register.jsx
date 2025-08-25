@@ -446,7 +446,7 @@ const ReferralComponent = () => {
             />
 
             <RegBlock>
-                <RegTitle>Количество регистраций: {totalRegistrations}</RegTitle>
+                <RegTitle>Количество регистраций: {chartData.length}</RegTitle>
                 <RegList>
                     {chartData
                         .filter(item => item.registrations > 0)

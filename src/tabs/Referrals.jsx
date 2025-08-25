@@ -361,7 +361,7 @@ function Referrals() {
                                     placeholder="Поиск"
                                 />
                             </SearchButton>
-                            <p>Количество пользователей: <span>114</span></p>
+                            <p>Количество пользователей: <span>{filteredData.length}</span></p>
                         </SearchWrapper>
                         <ButtonDefault ButtonTitle={"+ Добавить рефералов"} onClick={() => setAddingReferral(true)}/>
                     </>
