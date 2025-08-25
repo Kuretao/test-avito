@@ -103,13 +103,16 @@ function IndexHeader() {
 
     const partner = data?.partner_data || {};
 
-
+    function formatNumber(num) {
+        if (num == null || isNaN(num)) return "";
+        return new Intl.NumberFormat("ru-RU").format(num);
+    }
     const dynamicData = [
         {
             id: 1,
             title: 'Баланс на счете',
             question: true,
-            value: `${partner.current_balance ?? 0} руб.`,
+            value: `${formatNumber(partner.current_balance) ?? 0} руб.`,
         },
         { id: 2, title: 'Группа 1', question: false, value: <>40 %</> },
         { id: 3, title: 'Группа 2', question: false, value: <>40 %</> },
