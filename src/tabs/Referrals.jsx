@@ -215,14 +215,14 @@ function Referrals() {
     const statsByDate = data?.referral_stats?.stats_by_date || {};
     const dates = Object.keys(statsByDate);
 
-    const formatted = referrals.map((r, idx) => ({
-        date: dates[idx] || "-",
-        amount: r.referral_id,
-        payoutRequest: [{ type: "info", label: r.total_amount }],
-        transferTo: [{ type: "success", label: r.total_reward }],
-        status: r.name,
+    const formatted = referrals.map((r) => ({
+        date: r.created_at ? new Date(r.created_at).toLocaleString("ru-RU") : "-",
+        amount: r.referral_id || "-",
+        payoutRequest: [{ type: "info", label: r.total_amount ?? 0 }],
+        transferTo: [{ type: "success", label: r.total_reward ?? 0 }],
+        status: r.name || "-",
     }))
-    .sort((a, b) => new Date(b.date) - new Date(a.date));
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
     const filteredData = formatted.filter(
         (item) =>
             item.date?.includes(searchTerm) ||
