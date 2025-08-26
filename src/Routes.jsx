@@ -7,7 +7,7 @@ import ReferralComponent from "./tabs/Register.jsx";
 import {PayReferrals} from "./tabs/PayReferrals.jsx";
 import {Rules} from "./tabs/Rules.jsx";
 import {Acts} from "./tabs/Acts.jsx";
-import {DataProvider} from "./DataProvider/DataProvider.jsx";
+import {DataProvider, useData} from "./DataProvider/DataProvider.jsx";
 
 
 const Wrapper = styled.main`
@@ -18,12 +18,19 @@ const Wrapper = styled.main`
 `
 
 function AppRoutes(){
+    const { data, loading, error } = useData();
+
+    if (loading) return <div>Загрузка...</div>;
+    if (error) return <div>Ошибка загрузки данных</div>;
+
+    const isAgreementAccepted = data?.partner_data.agreement_accepted;
+
     return (
         <DataProvider>
             <Wrapper>
-                <TabsNavigation/>
+                <TabsNavigation disabled={!isAgreementAccepted}/>
                 <Routes>
-                    <Route path="/" element={<Partners />} />
+                    <Route path="/" element={<Partners disabled={!isAgreementAccepted}/>} />
                     <Route path="/referral" element={<Referrals />} />
                     <Route path="/registration" element={<ReferralComponent/>}/>
                     <Route path="/payToReferral" element={<PayReferrals/>}/>

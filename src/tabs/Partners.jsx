@@ -10,13 +10,23 @@ const Main = styled.main`
     gap: 20px;
 `
 
-function Partners() {
+function Partners({ disabled }) {
 
     return (
         <Main>
             <IndexHeader/>
-            <Requisites/>
-            <IndexTable/>
+
+            {disabled ? (
+                <>
+
+                </>
+            ) : (
+                <>
+                    <Requisites/>
+                    <IndexTable/>
+                </>
+            )}
+
         </Main>
     )
 }
