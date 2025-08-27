@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { HeaderDataItem } from "./HeaderData.jsx";
 import { ButtonDefault } from "../../ui/Button.jsx";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import api from "../../api/apiAxios.js";
 import {useData} from "../../DataProvider/DataProvider.jsx";
 import {sendAgreement} from "../../api/apiMetods.js";
@@ -98,7 +98,12 @@ function IndexHeader() {
 
     const [show, setShow] = useState(false);
     const [checked, setChecked] = useState(false);
-
+    useEffect(() => {
+        if (data && data.partner_data) {
+            setChecked(data.partner_data.agreement_accepted || false);
+            setShow(!data.partner_data.agreement_accepted);
+        }
+    }, [data]);
     if (loading) return <p>Загрузка данных...</p>;
     if (error) return <p>Ошибка загрузки данных</p>;
 
