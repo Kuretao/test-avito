@@ -4,6 +4,7 @@ import { ButtonDefault } from "../../ui/Button.jsx";
 import { useState } from "react";
 import api from "../../api/apiAxios.js";
 import {useData} from "../../DataProvider/DataProvider.jsx";
+import {sendAgreement} from "../../api/apiMetods.js";
 
 const Header = styled.header`
     display: flex;
@@ -115,27 +116,24 @@ function IndexHeader() {
             value: `${formatNumber(partner.current_balance) ?? 0} руб.`,
         },
         { id: 2, title: 'Группа 1', question: false, value: <>40 %</> },
-        { id: 3, title: 'Группа 2', question: false, value: <>40 %</> },
-        { id: 4, title: 'Группа 3', question: false, value: <>40 %</> },
-        { id: 5, title: 'Группа 4', question: false, value: <>40 %</> },
+        { id: 3, title: 'Группа 2', question: false, value: <>20 %</> },
+        { id: 4, title: 'Группа 3', question: false, value: <>10 %</> },
+        { id: 5, title: 'Группа 4', question: false, value: <>5 %</> },
     ];
 
-    const handleApiRequest = async () => {
-        try {
-            const response = await api.post("/api/withdraw", { user_id: partner.contact_id });
-            console.log("Успех:", response.data);
-        } catch (error) {
-            console.error("Ошибка запроса:", error);
-        }
-    };
 
-    const handleContinueClick = () => {
+
+    const handleContinueClick = async () => {
         if (checked) {
-            handleApiRequest();
+            try {
+                const response = await sendAgreement();
+                console.log("Соглашение подтверждено:", response.data);
+                window.location.reload();
+            } catch (err) {
+                console.error("Ошибка при подтверждении соглашения:", err);
+            }
         }
     };
-
-    const isButtonActive = partner.button_active && partner.agreement_accepted;
 
     return (
         <Header>
@@ -183,7 +181,7 @@ function IndexHeader() {
                             handleContinueClick();
                         }
                     }}
-                    disabled={show && (!checked || !isButtonActive)}
+                    disabled={show && !checked}
                 />
             </HeaderLeftSide>
         </Header>
