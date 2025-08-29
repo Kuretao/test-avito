@@ -5,6 +5,10 @@ import {useEffect, useState} from "react";
 import api from "../../api/apiAxios.js";
 import {useData} from "../../DataProvider/DataProvider.jsx";
 import {sendAgreement} from "../../api/apiMetods.js";
+import {Modal} from "../Modal/Modal.jsx";
+import Input from "../../ui/Input.jsx";
+import {Dropdown} from "../../ui/Dropdown.jsx";
+import PayoutModal from "../Modal/PayoutModal.jsx";
 
 const Header = styled.header`
     display: flex;
@@ -93,9 +97,53 @@ const HeaderCheckboxLabel = styled.label`
     }
 `;
 
+const ModalContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    
+    span{
+        font-family: Manrope,sans-serif;
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 100%;
+        font-variant-numeric-figure: lining-nums;
+        font-variant-numeric-spacing: proportional-nums;
+        color: #94A3BB;
+    }
+    
+    hr{
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: none;
+        background-color: #CBD5E1;
+    }
+    
+`
+
+const ModalInputs = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    >div{
+        margin: 0;
+    }
+    
+    >:first-child{
+        width: 100%;
+        height: 32px;
+        
+        > div{
+            height: 100%;
+            border: 1px solid #CBD5E1;
+        }
+    }
+`
+
 function IndexHeader() {
     const { data, loading, error } = useData();
-
+    const [modalOpen, setModalOpen] = useState(false);
     const [show, setShow] = useState(false);
     const [checked, setChecked] = useState(false);
     useEffect(() => {
@@ -106,9 +154,7 @@ function IndexHeader() {
     }, [data]);
     if (loading) return <p>Загрузка данных...</p>;
     if (error) return <p>Ошибка загрузки данных</p>;
-
     const partner = data?.partner_data || {};
-
     function formatNumber(num) {
         if (num == null || isNaN(num)) return "";
         return new Intl.NumberFormat("ru-RU").format(num);
@@ -125,21 +171,21 @@ function IndexHeader() {
         { id: 4, title: 'Группа 3', question: false, value: <>10 %</> },
         { id: 5, title: 'Группа 4', question: false, value: <>5 %</> },
     ];
-
-
-
     const handleContinueClick = async () => {
         if (checked) {
-            try {
-                const response = await sendAgreement();
-                console.log("Соглашение подтверждено:", response.data);
-                window.location.reload();
-            } catch (err) {
-                console.error("Ошибка при подтверждении соглашения:", err);
+            if (!data.partner_data.agreement_accepted) {
+                try {
+                    const response = await sendAgreement();
+                    console.log("Соглашение подтверждено:", response.data);
+                    window.location.reload();
+                } catch (err) {
+                    console.error("Ошибка при подтверждении соглашения:", err);
+                }
+            } else {
+                setModalOpen(true);
             }
         }
     };
-
     return (
         <Header>
             <HeaderContent>
@@ -183,12 +229,27 @@ function IndexHeader() {
                         if (!show) {
                             setShow(true);
                         } else {
-                            handleContinueClick();
+                            if (data.partner_data.agreement_accepted) {
+                                setModalOpen(true);
+                            } else {
+                                handleContinueClick();
+                            }
                         }
                     }}
                     disabled={show && !checked}
                 />
             </HeaderLeftSide>
+
+
+            {modalOpen && (
+                <PayoutModal
+                    partner={partner}
+                    balance={partner.current_balance}
+                    inn={partner.RQ_INN}
+                    idAcc={partner.contact_id}
+                    onClose={() => setModalOpen(false)}
+                />
+            )}
         </Header>
     );
 }

@@ -8,8 +8,8 @@ const ModalHead = styled.div`
     
     h3{
         font-family: Manrope,sans-serif;
-        font-weight: 700;
-        font-size: 20px;
+        font-weight: 600;
+        font-size: 24px;
         leading-trim: NONE;
         line-height: 24px;
         letter-spacing: 0;
@@ -19,9 +19,9 @@ const ModalHead = styled.div`
     }
 `
 
-export const ModalHeader = ({ModalTitle}) => (
+export const ModalHeader = ({ModalTitle, onPropsClick}) => (
     <ModalHead>
         <h3>{ModalTitle}</h3>
-        <img src={closeIcon} alt="close"/>
+        <img src={closeIcon} style={{width: 22, height: 22}} alt="close" onClick={onPropsClick}/>
     </ModalHead>
 )

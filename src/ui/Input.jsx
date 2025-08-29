@@ -35,21 +35,28 @@ const SearchButton = styled.button`
     padding: 0;
 `;
 
-export default function Input({ value, style, onChange, onSearch, placeholder, icon }) {
+export default function Input({
+                                  value, style, onChange, onSearch, placeholder, icon, type = "text", min, max, readOnly, id
+                              }) {
     return (
         <InputWrapper style={style}>
             <InputStyled
-                type="text"
+                type={type}
                 value={value}
-                onChange={onChange}
+                onChange={readOnly ? undefined : onChange}
                 placeholder={placeholder}
+                readOnly={readOnly}
+                min={min}
+                max={max}
                 onKeyDown={(e) => {
-                    if (e.key === "Enter") onSearch();
+                    if (e.key === "Enter" && onSearch) onSearch();
                 }}
             />
-            <SearchButton onClick={onSearch} aria-label="Search">
-                {icon ? icon : < img src={SearchIcon} alt="search-icon"/>}
-            </SearchButton>
+            {onSearch && (
+                <SearchButton type="button" onClick={onSearch} aria-label="Search">
+                    {icon ? icon : <img src={SearchIcon} alt="search-icon" />}
+                </SearchButton>
+            )}
         </InputWrapper>
     );
 }

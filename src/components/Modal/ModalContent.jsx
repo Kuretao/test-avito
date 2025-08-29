@@ -7,8 +7,8 @@ const ModalBodyContainer = styled.div`
     gap: 16px;
 `
 
-export const ModalBody = () => (
-    <ModalBody>
+export const ModalBody = ({children}) => (
+    <ModalBodyContainer>
         {children}
-    </ModalBody>
+    </ModalBodyContainer>
 )
