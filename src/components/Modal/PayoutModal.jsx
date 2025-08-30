@@ -163,16 +163,19 @@ function PayoutModal({ partner, balance, onClose, inn, idAcc }) {
 
         try {
             if (payoutMethod === "bank") {
-                if (remaining <= 0) {
+                if (remaining === 0) {
                     await zapros_na_vyplaty(payloadBank);
                 } else {
-                    await zapros_na_vyplaty(payloadBank);
-                    await zapros_na_vyplaty(payloadB2b);
+                    await Promise.all([
+                        zapros_na_vyplaty(payloadBank),
+                        zapros_na_vyplaty(payloadB2b)
+                    ]);
                 }
             } else if (payoutMethod === "b2b") {
                 await zapros_na_vyplaty(payloadB2bOnly);
             }
 
+            window.location.reload();
             onClose();
         } catch (e) {
             console.error("Ошибка при запросе выплаты:", e);
